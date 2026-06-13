@@ -1,0 +1,248 @@
+import nodemailer from "nodemailer";
+import { Job } from "./types";
+
+// Sends mail through Gmail's SMTP. Requires GMAIL_USER (the full Gmail/Workspace
+// address) and GMAIL_APP_PASSWORD (a 16-character Google "app password").
+function getTransport() {
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!user || !pass) throw new Error("GMAIL_USER and GMAIL_APP_PASSWORD must be set");
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: { user, pass },
+  });
+}
+
+async function sendMail(opts: { to: string; subject: string; html: string }) {
+  const user = process.env.GMAIL_USER;
+  // Gmail rewrites the From to the authenticated account, so we use it directly
+  // with a friendly display name.
+  await getTransport().sendMail({
+    from: `"GOOD THINKING Jobs" <${user}>`,
+    to: opts.to,
+    subject: opts.subject,
+    html: opts.html,
+  });
+}
+
+const ADMIN_EMAIL = "goodjobs@weareingoodco.com";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://getgoodthinking.com";
+
+function formatSalary(min: number, max: number) {
+  const fmt = (n: number) => `$${(n / 1000).toFixed(0)}K`;
+  return `${fmt(min)} – ${fmt(max)}`;
+}
+
+// Email 1: Admin approval request
+export async function sendApprovalRequest(job: Job) {
+  const approveUrl = `${BASE_URL}/api/approve?id=${job.id}&token=${job.approvalToken}`;
+  const denyUrl = `${BASE_URL}/api/deny?id=${job.id}&token=${job.approvalToken}`;
+
+  await sendMail({
+    to: ADMIN_EMAIL,
+    subject: `JOB FOR APPROVAL: ${job.companyName} · ${job.title}`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #111; color: #fff; padding: 40px;">
+        <div style="background: #F9FF00; padding: 12px 20px; margin-bottom: 32px; display: inline-block;">
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #111;">GOOD THINKING JOBS</span>
+        </div>
+
+        <h1 style="font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: -0.02em; margin: 0 0 8px; color: #fff;">
+          New Job Submission
+        </h1>
+        <p style="font-size: 13px; color: rgba(255,255,255,0.5); margin: 0 0 32px; text-transform: uppercase; letter-spacing: 0.08em;">
+          Awaiting your approval
+        </p>
+
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); width: 140px;">Company</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #fff; font-weight: 600;">${job.companyName}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Title</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #fff;">${job.title}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Department</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #fff;">${job.department}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Location</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #fff;">${job.location} · ${job.locationType}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Level</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #fff;">${job.roleLevel}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Salary</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #fff;">${formatSalary(job.salaryMin, job.salaryMax)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Plan</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #F9FF00; font-weight: 700; text-transform: uppercase;">${job.tier}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Posted by</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #fff;">${job.posterName} · ${job.posterEmail}</td>
+          </tr>
+          ${job.companyWebsite ? `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Website</td>
+            <td style="padding: 10px 0; font-size: 14px;"><a href="${job.companyWebsite}" style="color: #F9FF00;">${job.companyWebsite}</a></td>
+          </tr>
+          ` : ""}
+        </table>
+
+        <div style="background: rgba(255,255,255,0.05); padding: 20px; margin-bottom: 32px; border-left: 3px solid rgba(255,255,255,0.1);">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin: 0 0 10px;">Description</p>
+          <p style="font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.7; margin: 0; white-space: pre-wrap;">${job.description}</p>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-bottom: 40px;">
+          <a href="${approveUrl}" style="display: inline-block; background: #F9FF00; color: #111; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 14px 32px; text-decoration: none; margin-right: 12px;">
+            ✓ Approve &amp; Publish
+          </a>
+          <a href="${denyUrl}" style="display: inline-block; background: transparent; color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 14px 32px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2);">
+            ✗ Deny
+          </a>
+        </div>
+
+        <p style="font-size: 11px; color: rgba(255,255,255,0.25); margin: 0; line-height: 1.6;">
+          These links are single-use and unique to this submission. Approving will immediately publish the listing and notify the poster.
+        </p>
+      </div>
+    `,
+  });
+}
+
+// Email 2: Poster — job approved
+export async function sendApprovedEmail(job: Job) {
+  const jobUrl = `${BASE_URL}/jobs/${job.id}`;
+
+  await sendMail({
+    to: job.posterEmail,
+    subject: `Your listing is live: ${job.title} at ${job.companyName}`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 48px 44px; border: 1px solid #eeeeee;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
+
+        <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 20px; color: #111; line-height: 1.2;">
+          Your listing is live.
+        </h1>
+
+        <p style="font-size: 16px; color: #333333; line-height: 1.7; margin: 0 0 16px;">
+          <strong>${job.title}</strong> at <strong>${job.companyName}</strong> is now published on GOOD THINKING Jobs.
+        </p>
+        <p style="font-size: 16px; color: #555555; line-height: 1.7; margin: 0 0 28px;">
+          It's live in front of the 17,000+ brand, marketing, and creative leaders who read GOOD THINKING every Sunday.
+        </p>
+
+        <p style="margin: 0 0 36px;">
+          <a href="${jobUrl}" style="font-size: 15px; font-weight: 700; color: #111; text-decoration: none; border-bottom: 2px solid #F9FF00; padding-bottom: 2px;">View your listing &rarr;</a>
+        </p>
+
+        ${job.tier === "premium" ? `
+        <div style="background: #fffde6; border: 1px solid #f0ee99; padding: 20px; margin-bottom: 28px;">
+          <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #111; margin: 0 0 8px; font-weight: 700;">Premium · Newsletter Feature</p>
+          <p style="font-size: 13px; color: #555555; line-height: 1.65; margin: 0;">
+            Your listing is set to be featured in an upcoming GOOD THINKING Sunday newsletter. Listings submitted by end of day Thursday make that Sunday's letter. We'll reach out if we need anything from you before it goes out.
+          </p>
+        </div>
+        ` : ""}
+
+        <p style="font-size: 13px; color: #888888; line-height: 1.65; margin: 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
+          Active for 30 days. Questions? Reply to this email or reach us at goodjobs@weareingoodco.com.<br><br>GOOD THINKING · The weekly briefing on brand, culture, and marketing.
+        </p>
+      </div>
+    `,
+  });
+}
+
+// Email 3: Poster — job denied
+export async function sendDeniedEmail(job: Job) {
+  await sendMail({
+    to: job.posterEmail,
+    subject: `An update on your GOOD THINKING Jobs submission`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 48px 44px; border: 1px solid #eeeeee;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
+
+        <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 20px; color: #111; line-height: 1.2;">
+          We weren't able to approve this one.
+        </h1>
+
+        <p style="font-size: 16px; color: #333333; line-height: 1.7; margin: 0 0 16px;">
+          Thanks for submitting <strong>${job.title}</strong> at <strong>${job.companyName}</strong> to GOOD THINKING Jobs.
+        </p>
+        <p style="font-size: 16px; color: #555555; line-height: 1.7; margin: 0 0 28px;">
+          After reviewing your listing, we weren't able to approve it at this time. GOOD THINKING Jobs is focused on brand, marketing, and creative leadership roles. If your role fits that lens, you're welcome to revise and resubmit.
+        </p>
+
+        <p style="margin: 0 0 36px;">
+          <a href="${BASE_URL}/post" style="font-size: 15px; font-weight: 700; color: #111; text-decoration: none; border-bottom: 2px solid #F9FF00; padding-bottom: 2px;">Resubmit a listing &rarr;</a>
+        </p>
+
+        <p style="font-size: 13px; color: #888888; line-height: 1.65; margin: 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
+          Have questions? Reach us at goodjobs@weareingoodco.com.<br><br>GOOD THINKING · The weekly briefing on brand, culture, and marketing.
+        </p>
+      </div>
+    `,
+  });
+}
+
+// Email 4: Friday newsletter digest — sent to Chris to prep the Sunday letter.
+const DIGEST_RECIPIENT = "chris@weareingoodco.com";
+
+function digestJobRow(job: Job): string {
+  return `
+    <tr style="border-bottom: 1px solid #eeeeee;">
+      <td style="padding: 16px 0;">
+        <div style="font-size: 16px; font-weight: 700; color: #111;">${job.title}</div>
+        <div style="font-size: 13px; color: #555; margin-top: 3px;">${job.companyName} · ${job.location} · ${job.locationType}</div>
+        <div style="font-size: 13px; color: #888; margin-top: 3px;">${formatSalary(job.salaryMin, job.salaryMax)} · ${job.department}</div>
+        <a href="${BASE_URL}/jobs/${job.id}" style="display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 700; color: #111; text-decoration: none; border-bottom: 2px solid #F9FF00; padding-bottom: 1px;">View listing</a>
+      </td>
+    </tr>`;
+}
+
+export async function sendNewsletterDigest(featured: Job[], pendingPremium: Job[]) {
+  const featuredBlock = featured.length
+    ? `<table style="width: 100%; border-collapse: collapse; margin: 0 0 28px;">${featured.map(digestJobRow).join("")}</table>`
+    : `<p style="font-size: 15px; color: #555; line-height: 1.7; margin: 0 0 28px;">No jobs are flagged for the newsletter this week.</p>`;
+
+  const pendingBlock = pendingPremium.length
+    ? `<div style="background: #fffde6; border: 1px solid #f0ee99; padding: 20px; margin: 0 0 28px;">
+         <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #111; margin: 0 0 12px; font-weight: 700;">Premium · Awaiting your approval</p>
+         <p style="font-size: 13px; color: #555; line-height: 1.6; margin: 0 0 12px;">These premium listings came in but aren't approved yet, so they won't be featured until you approve them in the admin panel.</p>
+         <table style="width: 100%; border-collapse: collapse;">${pendingPremium.map(digestJobRow).join("")}</table>
+       </div>`
+    : "";
+
+  await sendMail({
+    to: DIGEST_RECIPIENT,
+    subject: `Featured jobs for Sunday's letter (${featured.length} ready)`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 48px 44px; border: 1px solid #eeeeee;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
+
+        <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 16px; color: #111; line-height: 1.2;">
+          Featured jobs for Sunday
+        </h1>
+        <p style="font-size: 15px; color: #555; line-height: 1.7; margin: 0 0 28px;">
+          Here's what's flagged for this Sunday's letter. Listings must be submitted by EOD Thursday to make the featured section.
+        </p>
+
+        ${featuredBlock}
+        ${pendingBlock}
+
+        <p style="font-size: 13px; color: #888; line-height: 1.65; margin: 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
+          Manage everything in the <a href="${BASE_URL}/admin" style="color: #111; border-bottom: 2px solid #F9FF00; text-decoration: none;">admin panel</a>.<br><br>GOOD THINKING · The weekly briefing on brand, culture, and marketing.
+        </p>
+      </div>
+    `,
+  });
+}

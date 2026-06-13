@@ -2,26 +2,145 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: "Trade Gothic";
+  src: url("/fonts/TradeGothic-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@font-face {
+  font-family: "Trade Gothic";
+  src: url("/fonts/TradeGothic-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Trade Gothic Condensed";
+  src: url("/fonts/TradeGothic-BoldCondensed.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Theme variables === */
+/* Corner rounding — two knobs: pill buttons, rounded containers */
+:root {
+  --r-pill: 9999px;  /* buttons → full pill */
+  --r-card: 24px;    /* containers/cards → rounded */
+}
+
+/* Default / dark mode */
+:root,
+:root.dark {
+  --gt-fg: 255 255 255;
+  --gt-bg: 0 0 0;
+  --gt-surface: 17 17 17;
+  --gt-muted: 136 136 136;
+}
+
+/* Light mode */
+:root.light {
+  --gt-fg: 17 17 17;
+  --gt-bg: 250 250 250;
+  --gt-surface: 241 241 241;
+  --gt-muted: 100 100 100;
+}
+
+/* In light mode, yellow accent text is invisible — use dark ink instead */
+:root.light .text-accent {
+  color: rgb(var(--gt-fg));
+}
+
+/* In light mode, accent buttons get a subtle outline so they don't float on white */
+:root.light .bg-accent {
+  outline: 1.5px solid rgba(0, 0, 0, 0.25);
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--gt-fg));
+  background: rgb(var(--gt-bg));
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+::selection {
+  background: rgba(232, 255, 0, 0.35);
+  color: #000;
+}
+
+input,
+textarea,
+select {
+  background: rgb(var(--gt-bg));
+  border: 1px solid rgb(var(--gt-fg) / 0.2);
+  color: rgb(var(--gt-fg));
+  border-radius: var(--r-card);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Replace the native dropdown arrow with a custom chevron we can position,
+   so it clears the rounded edge instead of being glued to it. */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 1.1rem center;
+  background-size: 12px;
+  padding-right: 2.75rem;
+}
+
+/* Containers / cards / accent blocks → rounded */
+.border,
+.border-2,
+.bg-accent {
+  border-radius: var(--r-card);
+}
+
+/* Buttons → full pill (declared after, so it wins for accent buttons too) */
+button,
+a.bg-accent {
+  border-radius: var(--r-pill);
+}
+
+/* Action buttons (not the flex-layout plan cards): center the text.
+   The [class] selector outranks Tailwind's py-* so we can apply an optical
+   nudge — slightly more top padding than bottom — so all-caps sits centered. */
+button:not(.flex),
+a.bg-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+}
+button:not(.flex)[class],
+a.bg-accent[class] {
+  padding-top: 0.95em;
+  padding-bottom: 0.72em;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #F9FF00;
+  box-shadow: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--gt-bg));
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--gt-fg) / 0.2);
 }
