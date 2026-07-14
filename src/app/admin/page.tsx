@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Job, Application } from "@/lib/types";
+import CuratePanel from "@/components/CuratePanel";
 
 function formatSalary(min: number, max: number): string {
   const fmt = (n: number) => `$${Math.round(n / 1000)}K`;
@@ -16,11 +17,12 @@ export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [tab, setTab] = useState<"jobs" | "newsletter">("jobs");
+  const [tab, setTab] = useState<"jobs" | "curate" | "newsletter">("jobs");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [copied, setCopied] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   const reload = useCallback(async () => {
     try {
@@ -144,6 +146,17 @@ export default function AdminPage() {
   const activeJobs = jobs.filter((j) => j.status === "active");
   const handledJobs = jobs.filter((j) => j.status === "removed" || j.status === "rejected");
 
+  // Search across name, company, email, apply URL and referral code so you can
+  // look up who used a code and when.
+  const q = search.trim().toLowerCase();
+  const visibleJobs = q
+    ? jobs.filter((j) =>
+        [j.title, j.companyName, j.posterName, j.posterEmail, j.externalApplyUrl, j.referralCode]
+          .filter(Boolean)
+          .some((field) => String(field).toLowerCase().includes(q))
+      )
+    : jobs;
+
   const statusColor = (status: Job["status"]) =>
     status === "active" ? "text-green-400" : status === "pending" ? "text-accent" : "text-red-400";
 
@@ -153,7 +166,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 mb-8 border-b border-white/10">
-        {(["jobs", "newsletter"] as const).map((t) => (
+        {(["jobs", "curate", "newsletter"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -161,7 +174,7 @@ export default function AdminPage() {
               tab === t ? "border-accent text-accent" : "border-transparent text-muted hover:text-white"
             }`}
           >
-            {t === "jobs" ? `All Postings (${jobs.length})` : "Newsletter Digest"}
+            {t === "jobs" ? `All Postings (${jobs.length})` : t === "curate" ? "Add from Link" : "Newsletter Digest"}
           </button>
         ))}
       </div>
@@ -179,12 +192,28 @@ export default function AdminPage() {
             </div>
           )}
 
+          <div className="mb-4">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search name, company, email, apply URL or referral code…"
+              className="w-full sm:max-w-md border-white/20"
+            />
+            {q && (
+              <p className="text-xs text-muted mt-1 font-secondary">
+                {visibleJobs.length} match{visibleJobs.length !== 1 ? "es" : ""}
+              </p>
+            )}
+          </div>
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10 text-left text-xs uppercase tracking-widest text-muted">
                   <th className="pb-3 pr-4">Job</th>
                   <th className="pb-3 pr-4">Company</th>
+                  <th className="pb-3 pr-4">Referral</th>
                   <th className="pb-3 pr-4">Tier</th>
                   <th className="pb-3 pr-4">Salary</th>
                   <th className="pb-3 pr-4">Status</th>
@@ -193,10 +222,20 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {jobs.map((job) => (
+                {visibleJobs.map((job) => (
                   <tr key={job.id} className="border-b border-white/5 hover:bg-white/[0.02]">
                     <td className="py-3 pr-4 font-medium max-w-[200px] truncate">{job.title}</td>
-                    <td className="py-3 pr-4 text-muted">{job.companyName}</td>
+                    <td className="py-3 pr-4 text-muted">
+                      <div>{job.companyName}</div>
+                      <div className="text-xs text-muted/70 truncate max-w-[180px]">{job.posterName} · {job.posterEmail}</div>
+                    </td>
+                    <td className="py-3 pr-4">
+                      {job.referralCode ? (
+                        <span className="text-xs px-2 py-0.5 font-bold uppercase tracking-wider bg-accent/20 text-accent">{job.referralCode}</span>
+                      ) : (
+                        <span className="text-muted/40">—</span>
+                      )}
+                    </td>
                     <td className="py-3 pr-4">
                       <span className={`text-xs px-2 py-0.5 font-bold uppercase tracking-wider ${
                         job.tier === "premium" ? "bg-accent text-black" : job.tier === "standard" ? "bg-white/10 text-white" : "text-muted"
@@ -251,9 +290,11 @@ export default function AdminPage() {
                     </td>
                   </tr>
                 ))}
-                {jobs.length === 0 && (
+                {visibleJobs.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-muted">No postings yet.</td>
+                    <td colSpan={8} className="py-8 text-center text-muted">
+                      {q ? "No matches." : "No postings yet."}
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -296,6 +337,9 @@ export default function AdminPage() {
           )}
         </div>
       )}
+
+      {/* Curate Tab */}
+      {tab === "curate" && <CuratePanel password={password} onPosted={reload} />}
 
       {/* Newsletter Tab */}
       {tab === "newsletter" && (

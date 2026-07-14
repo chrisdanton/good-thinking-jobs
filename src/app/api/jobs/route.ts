@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { sendApprovalRequest } from "@/lib/email";
 import { Job, Department, LocationType, RoleLevel, Tier } from "@/lib/types";
-import { EXPIRY_DAYS, validateSalaryForTier } from "@/lib/constants";
+import { EXPIRY_DAYS, validateSalaryForTier, isPromoActive, isValidReferralCode } from "@/lib/constants";
 
 function rowToJob(row: Record<string, unknown>): Job {
   return {
@@ -55,6 +55,21 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
+  // Paid plans can only post for free through this endpoint during the launch
+  // promo, or when a valid referral code is supplied. Otherwise they must pay via
+  // Stripe (/api/checkout). Enforced server-side so it can't be bypassed.
+  const tier = body.tier as Tier;
+  if (
+    (tier === "standard" || tier === "premium") &&
+    !isPromoActive() &&
+    !isValidReferralCode(body.referralCode)
+  ) {
+    return NextResponse.json(
+      { error: "That plan requires payment or a valid referral code." },
+      { status: 402 }
+    );
+  }
+
   // Enforce the tier's salary band server-side so the client check can't be bypassed.
   const salaryError = validateSalaryForTier(
     body.tier as Tier,
@@ -69,6 +84,11 @@ export async function POST(req: NextRequest) {
   const id = `job-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   const approvalToken = crypto.randomUUID();
   const expiresAt = new Date(now.getTime() + EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+  // Record the referral code on the listing so past use is searchable in /admin.
+  const referralCode = isValidReferralCode(body.referralCode)
+    ? String(body.referralCode).trim()
+    : "";
 
   const row = {
     id,
@@ -93,9 +113,19 @@ export async function POST(req: NextRequest) {
     approval_token: approvalToken,
     created_at: now.toISOString(),
     expires_at: expiresAt,
+    referral_code: referralCode,
   };
 
-  const { error } = await getSupabase().from("jobs").insert(row);
+  let { error } = await getSupabase().from("jobs").insert(row);
+
+  // If the referral_code column hasn't been added to the database yet, the insert
+  // would fail. Fall back to posting without it so jobs never break; once the
+  // column exists, codes start saving automatically.
+  if (error && /referral_code/i.test(error.message || "")) {
+    const rowWithoutCode: Record<string, unknown> = { ...row };
+    delete rowWithoutCode.referral_code;
+    ({ error } = await getSupabase().from("jobs").insert(rowWithoutCode));
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -104,7 +134,7 @@ export async function POST(req: NextRequest) {
   const job: Job = rowToJob({ ...row, id, approval_token: approvalToken });
 
   try {
-    await sendApprovalRequest(job);
+    await sendApprovalRequest(job, referralCode || undefined);
   } catch (emailErr) {
     console.error("Failed to send approval email:", emailErr);
   }

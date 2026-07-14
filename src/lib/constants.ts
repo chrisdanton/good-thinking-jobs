@@ -82,6 +82,18 @@ export function validateSalaryForTier(tier: Tier, min: number, max: number): str
 
 export const EXPIRY_DAYS = 30;
 
+// Curated jobs (ones GOOD THINKING sources and posts itself, not paid submissions)
+// are tagged by this poster name so the board can label them and route "Apply" to
+// the original listing. They also run longer before expiring, since re-curating is
+// manual work.
+export const CURATED_POSTER_NAME = "GOOD THINKING";
+export const CURATED_POSTER_EMAIL = "goodjobs@weareingoodco.com";
+export const CURATED_EXPIRY_DAYS = 60;
+
+export function isCuratedJob(job: { posterName?: string }): boolean {
+  return job.posterName === CURATED_POSTER_NAME;
+}
+
 // Launch promo: every listing (all tiers) is comped (free) through this date.
 // Ends end-of-day June 23, 2026 (midnight ET June 24).
 export const PROMO_END = new Date("2026-06-24T04:00:00Z");
@@ -91,3 +103,17 @@ export function isPromoActive(): boolean {
 }
 
 export const PROMO_LABEL = "Launch offer: all plans are free through June 23.";
+
+// Referral codes comp a paid listing (skip Stripe) once the launch promo ends.
+// Hand a code to a brand and their listing posts free. Set the valid codes in the
+// REFERRAL_CODES environment variable as a comma-separated list, e.g.
+// "CODE1,CODE2". Codes are case-insensitive. This runs server-side only,
+// so the list is never exposed to the browser and the code can't be bypassed.
+export function isValidReferralCode(code: string | null | undefined): boolean {
+  if (!code) return false;
+  const valid = (process.env.REFERRAL_CODES || "")
+    .split(",")
+    .map((c) => c.trim().toLowerCase())
+    .filter(Boolean);
+  return valid.includes(code.trim().toLowerCase());
+}

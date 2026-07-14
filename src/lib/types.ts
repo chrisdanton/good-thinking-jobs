@@ -41,6 +41,7 @@ export interface Job {
   approvalToken: string;
   createdAt: string;
   expiresAt: string;
+  referralCode?: string;
 }
 
 export interface Application {

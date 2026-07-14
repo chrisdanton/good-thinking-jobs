@@ -44,9 +44,10 @@ export async function GET(req: NextRequest) {
   }
 
   const sb = getSupabase();
-  const [featuredRes, pendingRes] = await Promise.all([
+  const [featuredRes, pendingRes, activeRes] = await Promise.all([
     sb.from("jobs").select("*").eq("status", "active").eq("flagged_for_newsletter", true).order("created_at", { ascending: false }),
     sb.from("jobs").select("*").eq("status", "pending").eq("tier", "premium").order("created_at", { ascending: false }),
+    sb.from("jobs").select("*").eq("status", "active").gt("expires_at", new Date().toISOString()).order("created_at", { ascending: false }),
   ]);
 
   if (featuredRes.error) {
@@ -55,9 +56,10 @@ export async function GET(req: NextRequest) {
 
   const featured = (featuredRes.data || []).map(rowToJob);
   const pendingPremium = (pendingRes.data || []).map(rowToJob);
+  const activeJobs = (activeRes.data || []).map(rowToJob);
 
   try {
-    await sendNewsletterDigest(featured, pendingPremium);
+    await sendNewsletterDigest(featured, pendingPremium, activeJobs);
   } catch (err) {
     console.error("Failed to send newsletter digest:", err);
     return NextResponse.json({ error: "Failed to send digest" }, { status: 500 });

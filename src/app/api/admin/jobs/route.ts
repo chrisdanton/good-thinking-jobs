@@ -26,6 +26,7 @@ function rowToJob(row: Record<string, unknown>): Job {
     approvalToken: row.approval_token as string,
     createdAt: row.created_at as string,
     expiresAt: row.expires_at as string,
+    referralCode: (row.referral_code as string) || "",
   };
 }
 

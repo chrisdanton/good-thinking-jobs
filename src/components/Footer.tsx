@@ -1,6 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // The GOOD FUTURE section supplies its own footer.
+  if (pathname?.startsWith("/futures")) return null;
+
   return (
     <footer className="border-t border-white/10 mt-20">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

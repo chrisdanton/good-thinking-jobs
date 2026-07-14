@@ -3,6 +3,7 @@ import { Job } from "@/lib/types";
 import FeaturedBadge from "./FeaturedBadge";
 
 function formatSalary(min: number, max: number): string {
+  if (!min && !max) return "Salary not listed";
   const fmt = (n: number) =>
     n >= 1000 ? `$${Math.round(n / 1000)}K` : `$${n}`;
   return `${fmt(min)} – ${fmt(max)}`;

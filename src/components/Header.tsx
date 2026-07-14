@@ -47,6 +47,9 @@ function ThemeToggle() {
 export default function Header() {
   const pathname = usePathname();
 
+  // The GOOD FUTURE section has its own header/nav and dark chrome.
+  if (pathname?.startsWith("/futures")) return null;
+
   return (
     <header className="border-b border-white/10 sticky top-0 z-50 bg-background/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">

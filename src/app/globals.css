@@ -60,6 +60,79 @@
   outline: 1.5px solid rgba(0, 0, 0, 0.25);
 }
 
+/* === GOOD FUTURE section === */
+/* Locked to dark regardless of the site theme toggle, and reset to the sharp
+   editorial corners of the original Webflow design. */
+.futures-root {
+  --gt-fg: 255 255 255;
+  --gt-bg: 0 0 0;
+  --gt-surface: 17 17 17;
+  --gt-muted: 150 150 150;
+  background-color: #000;
+  color: #fff;
+}
+.futures-root .text-accent {
+  color: #f9ff00 !important;
+}
+.futures-root .bg-accent {
+  outline: none !important;
+}
+/* Sharp corners: undo the global rounded/pill defaults inside futures. */
+.futures-root .border,
+.futures-root .border-2,
+.futures-root .bg-accent,
+.futures-root button,
+.futures-root a.bg-accent,
+.futures-root input,
+.futures-root textarea,
+.futures-root select {
+  border-radius: 0;
+}
+/* Opt specific bits back into a pill via .futures-pill. */
+.futures-root .futures-pill {
+  border-radius: 9999px;
+}
+
+/* Rich-text (Webflow CMS) content rendered inside the futures pages. */
+.futures-prose {
+  font-family: "Lato", system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.futures-prose p {
+  margin: 0 0 1.1em;
+}
+.futures-prose a {
+  color: #f9ff00;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.futures-prose strong {
+  color: #fff;
+  font-weight: 700;
+}
+.futures-prose ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0 0 1.1em;
+}
+.futures-prose ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+  margin: 0 0 1.1em;
+}
+.futures-prose li {
+  margin: 0 0 0.5em;
+}
+.futures-prose h2,
+.futures-prose h3 {
+  font-family: '"Trade Gothic Condensed"', system-ui, sans-serif;
+  text-transform: uppercase;
+  color: #fff;
+  margin: 1.4em 0 0.4em;
+}
+
 body {
   color: rgb(var(--gt-fg));
   background: rgb(var(--gt-bg));

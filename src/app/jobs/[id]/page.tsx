@@ -7,6 +7,7 @@ import FeaturedBadge from "@/components/FeaturedBadge";
 import { Job } from "@/lib/types";
 
 function formatSalary(min: number, max: number): string {
+  if (!min && !max) return "Salary not listed";
   const fmt = (n: number) => `$${(n / 1000).toFixed(0)}K`;
   return `${fmt(min)} – ${fmt(max)}`;
 }
@@ -95,10 +96,12 @@ export default function JobDetailPage() {
         <div className="text-white/80 leading-relaxed whitespace-pre-line font-secondary text-[15px]">{job.description}</div>
       </div>
 
-      <div className="mb-10">
-        <h2 className="text-xs uppercase tracking-widest text-muted mb-4 font-bold">Requirements</h2>
-        <div className="text-white/80 leading-relaxed whitespace-pre-line font-secondary text-[15px]">{job.requirements}</div>
-      </div>
+      {job.requirements && (
+        <div className="mb-10">
+          <h2 className="text-xs uppercase tracking-widest text-muted mb-4 font-bold">Requirements</h2>
+          <div className="text-white/80 leading-relaxed whitespace-pre-line font-secondary text-[15px]">{job.requirements}</div>
+        </div>
+      )}
 
       <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-sm text-muted">
         <div>Posted {formatDate(job.createdAt)} &middot; Expires {formatDate(job.expiresAt)}</div>

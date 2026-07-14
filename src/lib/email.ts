@@ -36,7 +36,7 @@ function formatSalary(min: number, max: number) {
 }
 
 // Email 1: Admin approval request
-export async function sendApprovalRequest(job: Job) {
+export async function sendApprovalRequest(job: Job, referralCode?: string) {
   const approveUrl = `${BASE_URL}/api/approve?id=${job.id}&token=${job.approvalToken}`;
   const denyUrl = `${BASE_URL}/api/deny?id=${job.id}&token=${job.approvalToken}`;
 
@@ -85,6 +85,12 @@ export async function sendApprovalRequest(job: Job) {
             <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Plan</td>
             <td style="padding: 10px 0; font-size: 14px; color: #F9FF00; font-weight: 700; text-transform: uppercase;">${job.tier}</td>
           </tr>
+          ${referralCode ? `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Referral</td>
+            <td style="padding: 10px 0; font-size: 14px; color: #fff;">${referralCode} · <span style="color: rgba(255,255,255,0.5);">posted free</span></td>
+          </tr>
+          ` : ""}
           <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
             <td style="padding: 10px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4);">Posted by</td>
             <td style="padding: 10px 0; font-size: 14px; color: #fff;">${job.posterName} · ${job.posterEmail}</td>
@@ -172,22 +178,18 @@ export async function sendDeniedEmail(job: Job) {
         <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
 
         <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 20px; color: #111; line-height: 1.2;">
-          We weren't able to approve this one.
+          Not quite a fit.
         </h1>
 
         <p style="font-size: 16px; color: #333333; line-height: 1.7; margin: 0 0 16px;">
           Thanks for submitting <strong>${job.title}</strong> at <strong>${job.companyName}</strong> to GOOD THINKING Jobs.
         </p>
-        <p style="font-size: 16px; color: #555555; line-height: 1.7; margin: 0 0 28px;">
-          After reviewing your listing, we weren't able to approve it at this time. GOOD THINKING Jobs is focused on brand, marketing, and creative leadership roles. If your role fits that lens, you're welcome to revise and resubmit.
-        </p>
-
-        <p style="margin: 0 0 36px;">
-          <a href="${BASE_URL}/post" style="font-size: 15px; font-weight: 700; color: #111; text-decoration: none; border-bottom: 2px solid #F9FF00; padding-bottom: 2px;">Resubmit a listing &rarr;</a>
+        <p style="font-size: 16px; color: #555555; line-height: 1.7; margin: 0 0 36px;">
+          We took a close look, and this one isn't quite right for our audience. If you think you've received this in error, though, please send us an email at <a href="mailto:goodjobs@weareingoodco.com" style="color: #111; font-weight: 600;">goodjobs@weareingoodco.com</a>.
         </p>
 
         <p style="font-size: 13px; color: #888888; line-height: 1.65; margin: 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
-          Have questions? Reach us at goodjobs@weareingoodco.com.<br><br>GOOD THINKING · The weekly briefing on brand, culture, and marketing.
+          GOOD THINKING · The weekly briefing on brand, culture, and marketing.
         </p>
       </div>
     `,
@@ -209,7 +211,128 @@ function digestJobRow(job: Job): string {
     </tr>`;
 }
 
-export async function sendNewsletterDigest(featured: Job[], pendingPremium: Job[]) {
+// Email 5: Monthly link-check report — sent to Chris after the cron sweeps
+// every live listing's apply link.
+interface LinkCheckItem {
+  id: string;
+  title: string;
+  company: string;
+  url: string;
+  reason: string;
+}
+
+function linkCheckRows(items: LinkCheckItem[]): string {
+  return items
+    .map(
+      (it) => `
+    <tr style="border-bottom: 1px solid #eeeeee;">
+      <td style="padding: 14px 0;">
+        <div style="font-size: 15px; font-weight: 700; color: #111;">${it.title}</div>
+        <div style="font-size: 13px; color: #555; margin-top: 3px;">${it.company}</div>
+        <div style="font-size: 12px; color: #888; margin-top: 3px;">${it.reason}</div>
+        <a href="${it.url}" style="font-size: 12px; color: #111; word-break: break-all;">${it.url}</a>
+      </td>
+    </tr>`
+    )
+    .join("");
+}
+
+export async function sendLinkCheckReport(report: {
+  checked: number;
+  aliveCount: number;
+  removed: LinkCheckItem[];
+  review: LinkCheckItem[];
+}) {
+  const { checked, aliveCount, removed, review } = report;
+
+  const removedBlock = removed.length
+    ? `<p style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #111; font-weight: 700; margin: 28px 0 8px;">Removed automatically (${removed.length})</p>
+       <table style="width: 100%; border-collapse: collapse;">${linkCheckRows(removed)}</table>`
+    : "";
+
+  const reviewBlock = review.length
+    ? `<div style="background: #fffde6; border: 1px solid #f0ee99; padding: 20px; margin: 28px 0 0;">
+         <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #111; font-weight: 700; margin: 0 0 8px;">Worth a look (${review.length})</p>
+         <p style="font-size: 13px; color: #555; line-height: 1.6; margin: 0 0 12px;">These didn't clearly fail, but I couldn't confirm they're still live. Check them and remove any that are filled from the admin panel.</p>
+         <table style="width: 100%; border-collapse: collapse;">${linkCheckRows(review)}</table>
+       </div>`
+    : "";
+
+  const allClear =
+    removed.length === 0 && review.length === 0
+      ? `<p style="font-size: 15px; color: #555; line-height: 1.7; margin: 0 0 8px;">All ${checked} live listings checked out. Nothing to clear.</p>`
+      : "";
+
+  await sendMail({
+    to: DIGEST_RECIPIENT,
+    subject: `Job board link check: ${removed.length} removed, ${review.length} to review`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 48px 44px; border: 1px solid #eeeeee;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
+
+        <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 16px; color: #111; line-height: 1.2;">
+          Monthly link check
+        </h1>
+        <p style="font-size: 15px; color: #555; line-height: 1.7; margin: 0 0 4px;">
+          Checked ${checked} live listing${checked !== 1 ? "s" : ""}. ${aliveCount} still live.
+        </p>
+        ${allClear}
+        ${removedBlock}
+        ${reviewBlock}
+
+        <p style="font-size: 13px; color: #888; line-height: 1.65; margin: 28px 0 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
+          Manage everything in the <a href="${BASE_URL}/admin" style="color: #111; border-bottom: 2px solid #F9FF00; text-decoration: none;">admin panel</a>.<br><br>GOOD THINKING · The weekly briefing on brand, culture, and marketing.
+        </p>
+      </div>
+    `,
+  });
+}
+
+// Joins a list into natural English: ["a","b","c"] -> "a, b and c".
+function joinNatural(items: string[]): string {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+// Friendly, lowercase category words for the copy line.
+const DEPT_WORD: Record<string, string> = {
+  Marketing: "marketing",
+  Brand: "brand",
+  Creative: "creative",
+  Strategy: "strategy",
+  Media: "media",
+  Operations: "operations",
+  "Executive/C-Suite": "executive",
+};
+
+// Builds the ready-to-copy blurb for Sunday's letter, e.g.
+// "We have marketing, creative and operations jobs from Nike, Target and Ōura. Check them out."
+function boardBlurb(activeJobs: Job[]): string {
+  if (activeJobs.length === 0) return "";
+
+  const depts = Array.from(
+    new Set(activeJobs.map((j) => DEPT_WORD[j.department]).filter(Boolean))
+  );
+  const brands = Array.from(new Set(activeJobs.map((j) => j.companyName).filter(Boolean)));
+
+  const deptPart = depts.length ? `${joinNatural(depts)} ` : "";
+  return `We have ${deptPart}jobs from ${joinNatural(brands)}. Check them out at getgoodthinking.com/jobs.`;
+}
+
+export async function sendNewsletterDigest(
+  featured: Job[],
+  pendingPremium: Job[],
+  activeJobs: Job[] = []
+) {
+  const blurb = boardBlurb(activeJobs);
+  const blurbBlock = blurb
+    ? `<div style="background: #f7f7f5; border: 1px dashed #ccc; padding: 20px; margin: 0 0 28px;">
+         <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 0 0 10px; font-weight: 700;">Copy for Sunday's letter</p>
+         <p style="font-size: 16px; color: #111; line-height: 1.6; margin: 0;">${blurb}</p>
+       </div>`
+    : "";
+
   const featuredBlock = featured.length
     ? `<table style="width: 100%; border-collapse: collapse; margin: 0 0 28px;">${featured.map(digestJobRow).join("")}</table>`
     : `<p style="font-size: 15px; color: #555; line-height: 1.7; margin: 0 0 28px;">No jobs are flagged for the newsletter this week.</p>`;
@@ -236,6 +359,7 @@ export async function sendNewsletterDigest(featured: Job[], pendingPremium: Job[
           Here's what's flagged for this Sunday's letter. Listings must be submitted by EOD Thursday to make the featured section.
         </p>
 
+        ${blurbBlock}
         ${featuredBlock}
         ${pendingBlock}
 

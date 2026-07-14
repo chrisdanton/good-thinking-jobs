@@ -33,12 +33,14 @@ export default function PostJobPage() {
     description: "",
     requirements: "",
     externalApplyUrl: "",
+    referralCode: "",
   });
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
   const [busy, setBusy] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [salaryError, setSalaryError] = useState("");
+  const [referralError, setReferralError] = useState("");
 
   const update = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -95,6 +97,7 @@ export default function PostJobPage() {
       requirements: form.requirements,
       externalApplyUrl: form.externalApplyUrl,
       tier: selectedTier,
+      referralCode: form.referralCode.trim(),
     };
   }
 
@@ -122,7 +125,11 @@ export default function PostJobPage() {
       }
       setSalaryError("");
     }
-    if (selectedTier === "free" || isPromoActive()) {
+    setReferralError("");
+    // Free tier and the launch promo always post for free. For paid tiers after
+    // the promo, a referral code comps the listing (the server validates it);
+    // without one, the poster goes to Stripe.
+    if (selectedTier === "free" || isPromoActive() || form.referralCode.trim()) {
       createJob();
     } else {
       startCheckout();
@@ -139,7 +146,10 @@ export default function PostJobPage() {
     setBusy(false);
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      if (data.error) {
+      // 402 = the referral code was missing or invalid for a paid plan.
+      if (res.status === 402) {
+        setReferralError(data.error || "That referral code isn't valid.");
+      } else if (data.error) {
         setSalaryError(data.error);
       } else {
         alert("Something went wrong. Please try again.");
@@ -327,6 +337,24 @@ export default function PostJobPage() {
                   <input required type="url" value={form.externalApplyUrl} onChange={(e) => update("externalApplyUrl", e.target.value)} placeholder="https://yourcompany.com/careers/..." className="w-full" />
                   <p className="text-xs text-muted mt-1 font-secondary">Candidates apply on your own job posting. Paste the link to it here.</p>
                 </div>
+                {selectedTier !== "free" && (
+                  <div>
+                    <label className="block text-xs text-muted mb-1 uppercase tracking-wider">
+                      Referral code <span className="normal-case tracking-normal">(optional)</span>
+                    </label>
+                    <input
+                      value={form.referralCode}
+                      onChange={(e) => { update("referralCode", e.target.value); setReferralError(""); }}
+                      placeholder="Have a code? Enter it here."
+                      className="w-full"
+                    />
+                    {referralError ? (
+                      <p className="text-xs mt-1 font-secondary text-red-400">{referralError}</p>
+                    ) : (
+                      <p className="text-xs text-muted mt-1 font-secondary">A valid code posts this listing for free.</p>
+                    )}
+                  </div>
+                )}
               </div>
             </section>
           </div>
@@ -350,6 +378,8 @@ export default function PostJobPage() {
                 ? "Post Job (Free)"
                 : promo
                 ? "Post Job (Free Launch Offer)"
+                : form.referralCode.trim()
+                ? "Post Job (Free)"
                 : "Continue to Checkout"}
             </button>
           </div>
