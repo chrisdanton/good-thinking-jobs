@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
 };
 
-const BOOKING_EMAIL = "chris@weareingoodco.com";
+const BOOKING_EMAIL = "hello@weareingoodco.com";
 const BOOKING_MAILTO = `mailto:${BOOKING_EMAIL}?subject=Speaking%20inquiry%20for%20GOOD%20THINKING`;
 
 const TALKS = [
@@ -44,13 +44,13 @@ const VIDEOS = [
 const SPEAKERS = [
   {
     name: "Kirsten Ludwig",
-    role: "Founder, In Good Co",
+    role: "Founder, IN GOOD CO",
     img: "/speaking/kirsten.jpg",
     bio: "Kirsten is one of the sharpest voices in brand and culture. She helps leaders build brands with a point of view, translating where the world is heading into strategy teams can actually use.",
   },
   {
     name: "Chris Danton",
-    role: "Partner, In Good Co · Writer, GOOD THINKING",
+    role: "Co-Founder, IN GOOD CO · Writer, GOOD THINKING",
     img: "/speaking/chris.jpg",
     bio: "Chris writes the GOOD THINKING letter, read each Sunday by 17,000+ brand and marketing leaders. He connects the dots between culture, creativity, and commerce, on the page and on stage.",
   },
@@ -65,10 +65,10 @@ export default function SpeakingPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="GOOD THINKING" className="h-6 sm:h-7 w-auto" />
         </a>
-        <nav className="hidden sm:flex items-center gap-8 text-xs uppercase tracking-widest text-white/70">
-          <a href="#talks" className="hover:text-white transition-colors">Talks</a>
-          <a href="#speakers" className="hover:text-white transition-colors">Speakers</a>
-          <a href="#stages" className="hover:text-white transition-colors">Stages</a>
+        <nav className="hidden sm:flex items-center gap-7 text-xs uppercase tracking-widest">
+          <a href="/futures" className="text-white/70 hover:text-white transition-colors">Good Future &apos;26</a>
+          <a href="/jobs" className="text-white/70 hover:text-white transition-colors">Job Board</a>
+          <a href="/speaking" className="text-accent transition-colors">Speaking</a>
         </nav>
         <a
           href={BOOKING_MAILTO}
@@ -109,13 +109,12 @@ export default function SpeakingPage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <div className="relative">
-              <div className="absolute -inset-2 border border-accent/40 pointer-events-none" aria-hidden />
+            <div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/speaking/duo.jpg"
                 alt="Kirsten Ludwig and Chris Danton"
-                className="relative w-full h-[440px] sm:h-[520px] lg:h-[640px] object-cover grayscale-[0.15]"
+                className="w-full h-[440px] sm:h-[520px] lg:h-[640px] object-cover grayscale-[0.15]"
               />
             </div>
           </div>
@@ -180,7 +179,7 @@ export default function SpeakingPage() {
           ))}
         </div>
         <p className="mt-10 text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl">
-          Together they lead <span className="text-white">In Good Co</span> and publish{" "}
+          Together they lead <span className="text-white">IN GOOD CO</span> and publish{" "}
           <span className="text-white">GOOD THINKING</span>, a weekly read on brand, marketing, and
           culture. They speak as a duo or solo, depending on the room.
         </p>
@@ -227,7 +226,7 @@ export default function SpeakingPage() {
       <section className="px-5 sm:px-8 lg:px-12 py-24 lg:py-32 border-t border-white/10 text-center">
         <p className="text-accent text-xs uppercase tracking-[0.25em] mb-6">Booking</p>
         <h2 className="speaking-display text-white text-5xl sm:text-8xl lg:text-[9rem] mb-10">
-          Bring GOOD<br />THINKING to<br />your stage.
+          Bring <span className="speaking-outline">GOOD<br />THINKING</span> to<br />your stage.
         </h2>
         <a
           href={BOOKING_MAILTO}
@@ -250,7 +249,7 @@ export default function SpeakingPage() {
           <img src="/logo.png" alt="GOOD THINKING" className="h-6 w-auto" />
           <span className="text-white/40 text-xs uppercase tracking-widest">by</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/speaking/igc-logo.svg" alt="In Good Co" className="h-4 w-auto" />
+          <img src="/speaking/igc-logo.svg" alt="IN GOOD CO" className="h-4 w-auto" />
         </div>
         <nav className="flex flex-wrap gap-x-8 gap-y-2 text-xs uppercase tracking-widest text-white/60">
           <a href="/jobs" className="hover:text-white transition-colors">Jobs</a>
@@ -258,7 +257,7 @@ export default function SpeakingPage() {
           <a href="https://ingoodco.substack.com" className="hover:text-white transition-colors">Newsletter</a>
           <a href={BOOKING_MAILTO} className="hover:text-white transition-colors">Contact</a>
         </nav>
-        <span className="text-white/30 text-xs">© {new Date().getFullYear()} In Good Co</span>
+        <span className="text-white/30 text-xs">© {new Date().getFullYear()} IN GOOD CO</span>
       </footer>
     </div>
   );
