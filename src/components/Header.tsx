@@ -49,6 +49,7 @@ export default function Header() {
 
   // The GOOD FUTURE section has its own header/nav and dark chrome.
   if (pathname?.startsWith("/futures")) return null;
+  if (pathname?.startsWith("/speaking")) return null;
 
   return (
     <header className="border-b border-white/10 sticky top-0 z-50 bg-background/90 backdrop-blur-md">

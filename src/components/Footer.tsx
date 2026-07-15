@@ -8,6 +8,7 @@ export default function Footer() {
 
   // The GOOD FUTURE section supplies its own footer.
   if (pathname?.startsWith("/futures")) return null;
+  if (pathname?.startsWith("/speaking")) return null;
 
   return (
     <footer className="border-t border-white/10 mt-20">

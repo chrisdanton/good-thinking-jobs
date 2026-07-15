@@ -133,6 +133,42 @@
   margin: 1.4em 0 0.4em;
 }
 
+/* === SPEAKING page === */
+/* Standalone speaker page (Kirsten + Chris). Locked dark with the sharp
+   editorial GOOD FUTURE graphic style, but kept independent from /futures. */
+.speaking-root {
+  --gt-fg: 255 255 255;
+  --gt-bg: 0 0 0;
+  --gt-surface: 17 17 17;
+  --gt-muted: 150 150 150;
+  background-color: #000;
+  color: #fff;
+}
+.speaking-root .text-accent {
+  color: #f9ff00 !important;
+}
+.speaking-root .bg-accent {
+  outline: none !important;
+}
+/* Sharp corners everywhere (undo global rounded/pill defaults). */
+.speaking-root .border,
+.speaking-root .border-2,
+.speaking-root .bg-accent,
+.speaking-root button,
+.speaking-root a.bg-accent,
+.speaking-root input,
+.speaking-root textarea,
+.speaking-root select {
+  border-radius: 0;
+}
+/* Big display headings share the condensed look used across GOOD THINKING. */
+.speaking-display {
+  font-family: '"Trade Gothic Condensed"', system-ui, sans-serif;
+  text-transform: uppercase;
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+}
+
 body {
   color: rgb(var(--gt-fg));
   background: rgb(var(--gt-bg));
