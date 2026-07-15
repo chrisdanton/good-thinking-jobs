@@ -44,15 +44,15 @@ const VIDEOS = [
 const SPEAKERS = [
   {
     name: "Kirsten Ludwig",
-    role: "Founder, IN GOOD CO",
+    role: "Co-Founder, IN GOOD CO",
     img: "/speaking/kirsten.jpg",
-    bio: "Kirsten is one of the sharpest voices in brand and culture. She helps leaders build brands with a point of view, translating where the world is heading into strategy teams can actually use.",
+    bio: "Kirsten Ludwig is a brand builder, cultural curator, and Co-Founder of IN GOOD CO, a global brand consultancy built for challenger brands that refuse to play it safe. She is the co-host of the GOOD THINKING podcast, a speaker and a top voice in brand. Her expertise is disrupting the status quo.",
   },
   {
     name: "Chris Danton",
     role: "Co-Founder, IN GOOD CO · Writer, GOOD THINKING",
     img: "/speaking/chris.jpg",
-    bio: "Chris writes the GOOD THINKING letter, read each Sunday by 17,000+ brand and marketing leaders. He connects the dots between culture, creativity, and commerce, on the page and on stage.",
+    bio: "Chris is an award-winning futurist, brand builder, author, speaker, and creative strategist. She is also the author and podcast co-host for GOOD THINKING, a publication read by top brand executives across the world. Her expertise is leading the future of brand.",
   },
 ];
 
@@ -180,8 +180,8 @@ export default function SpeakingPage() {
         </div>
         <p className="mt-10 text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl">
           Together they lead <span className="text-white">IN GOOD CO</span> and publish{" "}
-          <span className="text-white">GOOD THINKING</span>, a weekly read on brand, marketing, and
-          culture. They speak as a duo or solo, depending on the room.
+          <span className="text-white">GOOD THINKING</span>, a weekly newsletter and podcast on
+          brand, marketing, and culture. They speak as a duo or solo, depending on the room.
         </p>
       </section>
 
@@ -201,7 +201,7 @@ export default function SpeakingPage() {
         <img
           src="/speaking/onstage-duo.jpg"
           alt="Kirsten Ludwig and Chris Danton"
-          className="w-full h-[440px] lg:h-[620px] object-cover object-[center_28%] grayscale"
+          className="w-full h-[440px] lg:h-[620px] object-cover object-[center_28%]"
         />
         <div className="px-5 sm:px-8 lg:px-12 py-16 lg:py-20 grid md:grid-cols-2 gap-8 lg:gap-12">
           {VIDEOS.map((v) => (
