@@ -83,7 +83,7 @@ export default function SpeakingPage() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           <div className="lg:col-span-7">
             <p className="text-accent text-[10px] sm:text-sm uppercase tracking-[0.15em] sm:tracking-[0.25em] mb-6">
-              Keynotes · Conversations · Workshops
+              Keynotes · Live Podcasts · Workshops
             </p>
             <h1 className="speaking-display text-white text-[13.5vw] sm:text-[12.5vw] lg:text-[10.5rem]">
               Good<br />Thinking,<br />
@@ -199,9 +199,9 @@ export default function SpeakingPage() {
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/speaking/populous-sxsw.jpg"
-          alt="Kirsten and Chris speaking at SXSW"
-          className="w-full h-[420px] lg:h-[600px] object-cover"
+          src="/speaking/onstage-duo.jpg"
+          alt="Kirsten Ludwig and Chris Danton"
+          className="w-full h-[440px] lg:h-[620px] object-cover object-[center_28%] grayscale"
         />
         <div className="px-5 sm:px-8 lg:px-12 py-16 lg:py-20 grid md:grid-cols-2 gap-8 lg:gap-12">
           {VIDEOS.map((v) => (
