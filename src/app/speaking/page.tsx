@@ -1,13 +1,25 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Speaking · GOOD THINKING",
+  title: "Keynote Speakers on Brand, Culture & the Future · Kirsten Ludwig & Chris Danton",
   description:
-    "Keynotes, conversations, and workshops on brand, culture, and what's next, from Kirsten Ludwig & Chris Danton of GOOD THINKING.",
+    "Kirsten Ludwig and Chris Danton, Co-Founders of IN GOOD CO and hosts of the GOOD THINKING newsletter and podcast, keynote on brand, marketing, culture, consumer trends, and the future of brand.",
+  keywords: [
+    "keynote speaker",
+    "brand keynote speaker",
+    "marketing keynote speaker",
+    "consumer trends speaker",
+    "futurist speaker",
+    "culture keynote speaker",
+    "Kirsten Ludwig",
+    "Chris Danton",
+    "IN GOOD CO",
+    "GOOD THINKING",
+  ],
   openGraph: {
-    title: "Speaking · GOOD THINKING",
+    title: "Keynote Speakers on Brand, Culture & the Future · Kirsten Ludwig & Chris Danton",
     description:
-      "Keynotes, conversations, and workshops on brand, culture, and what's next, from Kirsten Ludwig & Chris Danton.",
+      "Kirsten Ludwig and Chris Danton keynote on brand, marketing, culture, consumer trends, and the future of brand.",
     images: ["/speaking/duo.jpg"],
     type: "website",
   },
@@ -24,13 +36,23 @@ const TALKS = [
   },
   {
     no: "02",
-    title: "Brands That Shape Culture",
-    body: "The strongest brands don't chase culture, they add to it. A playbook for earning relevance, taste, and staying power in a feed that forgets everything by Friday.",
+    title: "Thinking in Possibilities",
+    body: "Most brands stay boxed in by their own category. This is about breaking out of the silo, thinking beyond the confines of where you're supposed to play, and taking hold of your brand's trajectory instead of letting the market decide it for you.",
   },
   {
     no: "03",
-    title: "Good Thinking",
-    body: "How the best marketing and brand teams actually think: taste, judgment, and the craft of ideas in an age of infinite content and AI. Part keynote, part working session.",
+    title: "The Age of Authorship",
+    body: "AI just made building almost free, so execution is no longer the advantage. The hard part is mattering. Why vision, not output, is the real differentiator now, and what it means for brands when anyone can make anything.",
+  },
+  {
+    no: "04",
+    title: "The Public CMO",
+    body: "The most powerful brand asset a company has might be the person leading it. Why the next generation of CMOs and founders are becoming public figures, how to build a personal brand without the cringe, and what it unlocks for the brand behind you.",
+  },
+  {
+    no: "05",
+    title: "Live for the Unscalable",
+    body: "As AI makes everything instant and infinite, the rarest thing becomes what can't be automated: participation, shared stakes, and belonging. A playbook for building brands people actually show up for.",
   },
 ];
 
@@ -56,9 +78,66 @@ const SPEAKERS = [
   },
 ];
 
+const SITE_URL = "https://getgoodthinking.com";
+
+// Structured data (schema.org) so search engines and AI/agentic search can
+// identify Kirsten & Chris as keynote speakers, their topics, and affiliation.
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#ingoodco`,
+      name: "IN GOOD CO",
+      url: "https://weareingoodco.com",
+    },
+    {
+      "@type": "Person",
+      name: "Kirsten Ludwig",
+      jobTitle: "Keynote Speaker, Co-Founder of IN GOOD CO",
+      description: SPEAKERS[0].bio,
+      image: `${SITE_URL}${SPEAKERS[0].img}`,
+      url: `${SITE_URL}/speaking`,
+      worksFor: { "@id": `${SITE_URL}/#ingoodco` },
+      knowsAbout: [
+        "Brand strategy",
+        "Marketing",
+        "Culture",
+        "Consumer trends",
+        "Brand building",
+        "Challenger brands",
+        "The future of brand",
+      ],
+    },
+    {
+      "@type": "Person",
+      name: "Chris Danton",
+      jobTitle: "Keynote Speaker, Futurist, Co-Founder of IN GOOD CO",
+      description: SPEAKERS[1].bio,
+      image: `${SITE_URL}${SPEAKERS[1].img}`,
+      url: `${SITE_URL}/speaking`,
+      worksFor: { "@id": `${SITE_URL}/#ingoodco` },
+      knowsAbout: [
+        "Futures and foresight",
+        "Brand strategy",
+        "Marketing",
+        "Culture",
+        "Creativity",
+        "The Age of Authorship",
+        "Personal branding",
+        "The future of brand",
+      ],
+    },
+  ],
+};
+
 export default function SpeakingPage() {
   return (
     <div className="speaking-root min-h-screen overflow-x-hidden bg-black text-white font-sans selection:bg-accent">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+      />
       {/* Top bar */}
       <header className="sticky top-0 z-50 flex items-center justify-between px-5 sm:px-8 lg:px-12 py-4 bg-black/80 backdrop-blur-sm border-b border-white/10">
         <a href="/" className="shrink-0">
@@ -158,6 +237,28 @@ export default function SpeakingPage() {
           Every talk is tailored to your audience and shaped with you ahead of the date. Formats
           range from a 20-minute provocation to a half-day working session.
         </p>
+        <div className="mt-10">
+          <p className="text-white/40 text-[11px] uppercase tracking-[0.2em] mb-4">Topics we speak on</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              "Brand",
+              "Marketing",
+              "Culture",
+              "Consumer Trends",
+              "Futures & Foresight",
+              "Creativity",
+              "Personal Brand",
+              "The Future of Brand",
+            ].map((t) => (
+              <span
+                key={t}
+                className="border border-white/20 text-white/70 text-xs uppercase tracking-wide px-3 py-1.5"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Speakers */}
@@ -219,6 +320,45 @@ export default function SpeakingPage() {
               <p className="text-accent text-xs uppercase tracking-widest mt-3">{v.title}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* CMO Dinners */}
+      <section id="dinners" className="px-5 sm:px-8 lg:px-12 py-16 lg:py-24 border-t border-white/10">
+        <p className="text-accent text-xs uppercase tracking-[0.25em] mb-6">Convenings</p>
+        <h2 className="speaking-display text-accent text-5xl sm:text-7xl mb-8">CMO Dinners</h2>
+        <p className="speaking-display text-white text-2xl sm:text-4xl max-w-4xl leading-[1.05] mb-12">
+          A closed-door dinner for CMOs. Invite-only, curated by GOOD THINKING. People who
+          already trust us enough to cancel other plans.
+        </p>
+        <div className="grid sm:grid-cols-3 gap-4 mb-14">
+          {["dinner-1", "dinner-2", "dinner-3"].map((d) => (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              key={d}
+              src={`/speaking/${d}.jpg`}
+              alt="A GOOD THINKING CMO dinner"
+              className="w-full h-[260px] sm:h-[320px] object-cover"
+            />
+          ))}
+        </div>
+        <div className="grid md:grid-cols-2 gap-x-12 gap-y-6 max-w-5xl text-white/70 text-base sm:text-lg leading-relaxed">
+          <p>
+            Closed door. No phones. No devices of any kind. Because the best conversations are
+            never recorded.
+          </p>
+          <p>
+            Here&apos;s the thing about Cannes: the panels are packed. The activations are
+            impressive. The rosé is plentiful. And yet, the most valuable thing that happens
+            there has nothing to do with any of it.
+          </p>
+          <p>
+            It&apos;s the conversation at 8pm when the agenda falls away. When someone says the
+            thing you&apos;ve been thinking all week but couldn&apos;t say on stage.
+          </p>
+          <p className="speaking-display text-accent text-2xl sm:text-3xl self-end">
+            We&apos;re creating that. On purpose.
+          </p>
         </div>
       </section>
 
