@@ -36,6 +36,11 @@ const TALKS = [
 
 const STAGES = ["SXSW · Austin", "Brands & Culture · New York", "Private brand & leadership summits"];
 
+const VIDEOS = [
+  { title: "SXSW · Austin", id: "aWDxk7nBQ1s" },
+  { title: "Brands & Culture · New York", id: "lktsrBpM_0k" },
+];
+
 const SPEAKERS = [
   {
     name: "Kirsten Ludwig",
@@ -56,11 +61,9 @@ export default function SpeakingPage() {
     <div className="speaking-root min-h-screen overflow-x-hidden bg-black text-white font-sans selection:bg-accent">
       {/* Top bar */}
       <header className="sticky top-0 z-50 flex items-center justify-between px-5 sm:px-8 lg:px-12 py-4 bg-black/80 backdrop-blur-sm border-b border-white/10">
-        <a
-          href="/"
-          className="bg-accent text-black text-[11px] sm:text-xs font-bold uppercase tracking-wide px-3 py-1.5 leading-none"
-        >
-          Good Thinking
+        <a href="/" className="shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="GOOD THINKING" className="h-6 sm:h-7 w-auto" />
         </a>
         <nav className="hidden sm:flex items-center gap-8 text-xs uppercase tracking-widest text-white/70">
           <a href="#talks" className="hover:text-white transition-colors">Talks</a>
@@ -201,6 +204,23 @@ export default function SpeakingPage() {
           alt="Kirsten and Chris speaking at SXSW"
           className="w-full h-[420px] lg:h-[600px] object-cover"
         />
+        <div className="px-5 sm:px-8 lg:px-12 py-16 lg:py-20 grid md:grid-cols-2 gap-8 lg:gap-12">
+          {VIDEOS.map((v) => (
+            <div key={v.id}>
+              <div className="relative w-full aspect-video border border-white/15">
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${v.id}`}
+                  title={v.title}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <p className="text-accent text-xs uppercase tracking-widest mt-3">{v.title}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Booking CTA */}
@@ -225,11 +245,12 @@ export default function SpeakingPage() {
 
       {/* Footer */}
       <footer className="px-5 sm:px-8 lg:px-12 py-12 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <span className="bg-accent text-black text-[11px] font-bold uppercase tracking-wide px-3 py-1.5 leading-none">
-            Good Thinking
-          </span>
-          <span className="text-white/40 text-xs uppercase tracking-widest">by In Good Co</span>
+        <div className="flex items-center gap-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="GOOD THINKING" className="h-6 w-auto" />
+          <span className="text-white/40 text-xs uppercase tracking-widest">by</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/speaking/igc-logo.svg" alt="In Good Co" className="h-4 w-auto" />
         </div>
         <nav className="flex flex-wrap gap-x-8 gap-y-2 text-xs uppercase tracking-widest text-white/60">
           <a href="/jobs" className="hover:text-white transition-colors">Jobs</a>

@@ -163,7 +163,8 @@
 }
 /* Big display headings share the condensed look used across GOOD THINKING. */
 .speaking-display {
-  font-family: '"Trade Gothic Condensed"', system-ui, sans-serif;
+  font-family: "Trade Gothic Condensed", "Trade Gothic", system-ui, sans-serif;
+  font-weight: 700;
   text-transform: uppercase;
   line-height: 0.86;
   letter-spacing: -0.01em;
