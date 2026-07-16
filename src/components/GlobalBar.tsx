@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import ThemeToggle from "./ThemeToggle";
 
 // Universal header (tier 1): one compact row — section switcher (left),
 // GOOD THINKING logo (centered), BY IN GOOD CO (right). Kept to a single row so
@@ -41,16 +42,19 @@ export default function GlobalBar() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="GOOD THINKING" className="h-6 w-auto" />
         </a>
-        <a
-          href="https://weareingoodco.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden sm:flex justify-self-end items-center gap-2 col-start-3"
-        >
-          <span className="text-[10px] uppercase tracking-[0.2em] text-[#7a7a7a]">By</span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/igc-logo.svg" alt="IN GOOD CO" className="h-3.5 w-auto" />
-        </a>
+        <div className="justify-self-end col-start-3 flex items-center gap-4">
+          <ThemeToggle />
+          <a
+            href="https://weareingoodco.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex items-center gap-2"
+          >
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#7a7a7a]">By</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/igc-logo.svg" alt="IN GOOD CO" className="h-3.5 w-auto" />
+          </a>
+        </div>
       </div>
     </div>
   );
