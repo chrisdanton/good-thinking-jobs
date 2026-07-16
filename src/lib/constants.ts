@@ -94,15 +94,16 @@ export function isCuratedJob(job: { posterName?: string }): boolean {
   return job.posterName === CURATED_POSTER_NAME;
 }
 
-// Launch promo: every listing (all tiers) is comped (free) through this date.
-// Ends end-of-day June 23, 2026 (midnight ET June 24).
-export const PROMO_END = new Date("2026-06-24T04:00:00Z");
+// Promo: every listing (all tiers) is comped (free) through this date.
+// Free-posting window reopened 2026-07-16 for six months; ends end-of-day
+// January 16, 2027 (midnight ET January 17).
+export const PROMO_END = new Date("2027-01-17T05:00:00Z");
 
 export function isPromoActive(): boolean {
   return new Date() < PROMO_END;
 }
 
-export const PROMO_LABEL = "Launch offer: all plans are free through June 23.";
+export const PROMO_LABEL = "Posting is free for all roles through January 16, 2027.";
 
 // Referral codes comp a paid listing (skip Stripe) once the launch promo ends.
 // Hand a code to a brand and their listing posts free. Set the valid codes in the

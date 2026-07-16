@@ -399,7 +399,7 @@ export default function PostJobPage() {
           {promo && (
             <div className="bg-accent text-black px-5 py-4 mb-8">
               <p className="text-sm font-bold uppercase tracking-normal font-headline leading-relaxed">
-                🎉 {PROMO_LABEL} Pick any plan, you won&apos;t be charged. All we ask in exchange is to be patient with any bugs as we get this baby live!
+                🎉 {PROMO_LABEL} Pick any plan and you won&apos;t be charged. Your listing also goes out to 17,000+ leaders in the Sunday newsletter.
               </p>
             </div>
           )}
