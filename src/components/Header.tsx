@@ -51,7 +51,7 @@ export default function Header() {
   if (pathname?.startsWith("/speaking")) return null;
 
   return (
-    <header className="border-b border-white/10 sticky top-0 z-50 bg-background/90 backdrop-blur-md">
+    <header className="border-b border-white/10 bg-background/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
         {/* Left nav */}
         <nav className="flex items-center gap-6">
