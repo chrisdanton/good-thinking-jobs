@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -73,21 +72,6 @@ export default function Header() {
             Post a Job
           </Link>
         </nav>
-
-        {/* Center logo */}
-        <Link
-          href="/"
-          className="absolute left-1/2 -translate-x-1/2 hidden sm:block"
-        >
-          <Image
-            src="/logo.png"
-            alt="GOOD THINKING"
-            width={180}
-            height={40}
-            className="h-9 w-auto"
-            priority
-          />
-        </Link>
 
         {/* Right */}
         <div className="flex items-center gap-3">

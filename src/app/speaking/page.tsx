@@ -138,24 +138,7 @@ export default function SpeakingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
       />
-      {/* Top bar */}
-      <header className="sticky top-0 z-50 flex items-center justify-between px-5 sm:px-8 lg:px-12 py-4 bg-black/80 backdrop-blur-sm border-b border-white/10">
-        <a href="/" className="shrink-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="GOOD THINKING" className="h-6 sm:h-7 w-auto" />
-        </a>
-        <nav className="hidden sm:flex items-center gap-7 text-xs uppercase tracking-widest">
-          <a href="/futures" className="text-white/70 hover:text-white transition-colors">Good Future &apos;26</a>
-          <a href="/jobs" className="text-white/70 hover:text-white transition-colors">Job Board</a>
-          <a href="/speaking" className="text-accent transition-colors">Speaking</a>
-        </nav>
-        <a
-          href={BOOKING_MAILTO}
-          className="border border-accent text-accent text-[11px] sm:text-xs font-bold uppercase tracking-wide px-3 sm:px-4 py-1.5 leading-none hover:bg-accent hover:text-black transition-colors"
-        >
-          Book us
-        </a>
-      </header>
+      {/* Global switcher bar is rendered site-wide via layout.tsx (GlobalBar). */}
 
       {/* Hero */}
       <section className="px-5 sm:px-8 lg:px-12 pt-16 sm:pt-20 lg:pt-24 pb-16 lg:pb-24">
