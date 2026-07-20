@@ -15,8 +15,12 @@ import { publishCuratedJob, findExistingByApplyUrl } from "@/lib/publish-curated
 // changing the admin password.
 
 // Compare without leaking length/prefix information through timing.
-function tokenMatches(provided: string): boolean {
-  const expected = process.env.SHARE_TOKEN || "";
+function tokenMatches(providedRaw: string): boolean {
+  // Both sides are trimmed. It's easy to store a secret with a trailing newline
+  // (piping it in with `echo` is enough to do it), and the resulting failure
+  // looks exactly like a wrong token with nothing in the logs to say otherwise.
+  const expected = (process.env.SHARE_TOKEN || "").trim();
+  const provided = (providedRaw || "").trim();
   if (!expected || !provided || provided.length !== expected.length) return false;
   let diff = 0;
   for (let i = 0; i < expected.length; i++) {
