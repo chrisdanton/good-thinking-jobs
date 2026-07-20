@@ -253,7 +253,7 @@ export async function sendLinkCheckReport(report: {
   const reviewBlock = review.length
     ? `<div style="background: #fffde6; border: 1px solid #f0ee99; padding: 20px; margin: 28px 0 0;">
          <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #111; font-weight: 700; margin: 0 0 8px;">Worth a look (${review.length})</p>
-         <p style="font-size: 13px; color: #555; line-height: 1.6; margin: 0 0 12px;">These didn't clearly fail, but I couldn't confirm they're still live. Check them and remove any that are filled from the admin panel.</p>
+         <p style="font-size: 13px; color: #555; line-height: 1.6; margin: 0 0 12px;">These weren't removed automatically, either because the check wasn't conclusive or because someone paid for the placement. Reason is noted against each one. Remove any that are filled from the admin panel.</p>
          <table style="width: 100%; border-collapse: collapse;">${linkCheckRows(review)}</table>
        </div>`
     : "";
@@ -271,7 +271,7 @@ export async function sendLinkCheckReport(report: {
         <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
 
         <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 16px; color: #111; line-height: 1.2;">
-          Monthly link check
+          Weekly link check
         </h1>
         <p style="font-size: 15px; color: #555; line-height: 1.7; margin: 0 0 4px;">
           Checked ${checked} live listing${checked !== 1 ? "s" : ""}. ${aliveCount} still live.
