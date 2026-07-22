@@ -5,7 +5,10 @@ import { Job, Application } from "@/lib/types";
 import CuratePanel from "@/components/CuratePanel";
 
 function formatSalary(min: number, max: number): string {
+  if (!min && !max) return "Not listed";
   const fmt = (n: number) => `$${Math.round(n / 1000)}K`;
+  if (!max) return `From ${fmt(min)}`;
+  if (!min) return `Up to ${fmt(max)}`;
   return `${fmt(min)} – ${fmt(max)}`;
 }
 

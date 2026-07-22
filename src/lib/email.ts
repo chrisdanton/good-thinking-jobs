@@ -31,7 +31,10 @@ const ADMIN_EMAIL = "goodjobs@weareingoodco.com";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://getgoodthinking.com";
 
 function formatSalary(min: number, max: number) {
+  if (!min && !max) return "Salary not listed";
   const fmt = (n: number) => `$${(n / 1000).toFixed(0)}K`;
+  if (!max) return `From ${fmt(min)}`;
+  if (!min) return `Up to ${fmt(max)}`;
   return `${fmt(min)} – ${fmt(max)}`;
 }
 

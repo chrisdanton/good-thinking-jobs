@@ -9,6 +9,10 @@ import { Job } from "@/lib/types";
 function formatSalary(min: number, max: number): string {
   if (!min && !max) return "Salary not listed";
   const fmt = (n: number) => `$${(n / 1000).toFixed(0)}K`;
+  // Postings often give only one end of the range. Show that number on its own
+  // rather than pairing it with a "$0K" that reads as broken.
+  if (!max) return `From ${fmt(min)}`;
+  if (!min) return `Up to ${fmt(max)}`;
   return `${fmt(min)} – ${fmt(max)}`;
 }
 
