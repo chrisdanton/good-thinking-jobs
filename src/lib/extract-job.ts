@@ -70,6 +70,104 @@ function greenhouseApiFor(url: string, html: string): string | null {
   return `https://boards-api.greenhouse.io/v1/boards/${board}/jobs/${jid}`;
 }
 
+// Notion job pages (e.g. a small company that posts its roles as a public Notion
+// doc) are drawn entirely by Javascript: the fetched HTML is just a loading
+// spinner with no job text and no structured data, so the normal reader comes
+// back empty. Notion does expose the real content through a public JSON endpoint
+// its own web app calls — loadPageChunk — which returns every block on the page.
+// When the link is a Notion page, read that endpoint and flatten the blocks into
+// plain text instead of fetching the empty shell. Returns null for non-Notion
+// links or if the endpoint can't be read (we then fall back to the normal fetch).
+function notionPageIdFor(url: string): { origin: string; pageId: string } | null {
+  let u: URL;
+  try {
+    u = new URL(url);
+  } catch {
+    return null;
+  }
+  if (!/(^|\.)notion\.(site|so)$/i.test(u.hostname)) return null;
+  // The page id is the last run of 32 hex characters in the path.
+  const hex = u.pathname.replace(/-/g, "").match(/([0-9a-f]{32})(?!.*[0-9a-f]{32})/i)?.[1];
+  if (!hex) return null;
+  const pageId = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(
+    16,
+    20
+  )}-${hex.slice(20)}`;
+  // notion.so pages are served from www.notion.so; *.notion.site keeps its host.
+  const origin = /notion\.so$/i.test(u.hostname) ? "https://www.notion.so" : u.origin;
+  return { origin, pageId };
+}
+
+async function readNotionPage(url: string): Promise<string | null> {
+  const target = notionPageIdFor(url);
+  if (!target) return null;
+  let record: Record<string, { value?: { value?: NotionBlock } }>;
+  try {
+    const res = await fetch(`${target.origin}/api/v3/loadPageChunk`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36",
+      },
+      body: JSON.stringify({
+        pageId: target.pageId,
+        limit: 200,
+        cursor: { stack: [] },
+        chunkNumber: 0,
+        verticalColumns: false,
+      }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      recordMap?: { block?: Record<string, { value?: { value?: NotionBlock } }> };
+    };
+    record = data.recordMap?.block || {};
+  } catch {
+    return null;
+  }
+
+  const blockOf = (id: string): NotionBlock | undefined => record[id]?.value?.value;
+  const rootId = Object.keys(record).find((id) => blockOf(id)?.type === "page");
+  if (!rootId) return null;
+
+  // A title property is an array of [text, ...formatting] runs; we keep the text.
+  const runText = (title: unknown): string =>
+    Array.isArray(title)
+      ? title
+          .map((run) => (Array.isArray(run) && typeof run[0] === "string" ? run[0] : ""))
+          .join("")
+      : "";
+
+  const lines: string[] = [];
+  const seen = new Set<string>();
+  const walk = (id: string) => {
+    if (seen.has(id)) return; // guard against a malformed cyclic content list
+    seen.add(id);
+    const b = blockOf(id);
+    if (!b) return;
+    const text = runText(b.properties?.title);
+    if (/header/i.test(b.type || "")) {
+      if (text) lines.push(`\n${text}\n`);
+    } else if (/list|to_do/i.test(b.type || "")) {
+      if (text) lines.push(`- ${text}`);
+    } else if (text.trim()) {
+      lines.push(text);
+    }
+    for (const child of b.content || []) walk(child);
+  };
+  walk(rootId);
+
+  const out = lines.join("\n").trim();
+  return out.length > 40 ? out : null;
+}
+
+interface NotionBlock {
+  type?: string;
+  properties?: { title?: unknown };
+  content?: string[];
+}
+
 function stripTags(s: string): string {
   return s
     .replace(/<[^>]+>/g, " ")
@@ -257,13 +355,17 @@ export async function extractJobFromUrl(url: string): Promise<ExtractedJob> {
     );
   }
 
+  // Notion pages carry no content in their HTML; read Notion's own content API
+  // and hand the flattened blocks straight to the model as the page text.
+  const notionText = await readNotionPage(url);
+
   // Fetch the page. Some sites block obvious bots, so send a browser-like UA.
   // LinkedIn links are swapped for their public guest endpoint (see helper);
   // the original url is still what we save as the apply link below.
   const fetchUrl = readableUrlFor(url);
   let html = "";
   let isJson = false;
-  try {
+  if (!notionText) try {
     const res = await fetch(fetchUrl, {
       headers: {
         "User-Agent":
@@ -311,7 +413,9 @@ export async function extractJobFromUrl(url: string): Promise<ExtractedJob> {
     throw new ExtractError("Couldn't reach that page. Check the link, or fill the job in by hand.");
   }
 
-  const { jsonLd, text } = isJson
+  const { jsonLd, text } = notionText
+    ? { jsonLd: "", text: notionText.slice(0, 30000) }
+    : isJson
     ? { jsonLd: html.slice(0, 30000), text: "" }
     : extractReadable(html);
 
