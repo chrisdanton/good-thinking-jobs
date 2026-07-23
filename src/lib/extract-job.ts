@@ -54,6 +54,106 @@ export function readableUrlFor(url: string): string {
     : url;
 }
 
+// A lot of company career pages (a16z's portfolio jobs among them) are just a
+// Javascript shell that embeds a Greenhouse board: the page HTML carries no job
+// content, only a `?gh_jid=<id>` in the link and a Greenhouse embed script that
+// names the board. Greenhouse's public API returns the full posting as JSON, so
+// when we spot that pattern we read the API instead of the empty shell. Needs
+// the fetched HTML because the board token lives in the page, not the URL.
+function greenhouseApiFor(url: string, html: string): string | null {
+  const jid = url.match(/[?&]gh_jid=(\d+)/)?.[1];
+  if (!jid) return null;
+  const board =
+    html.match(/greenhouse\.io\/embed\/job_board\/js\?for=([a-z0-9_-]+)/i)?.[1] ||
+    html.match(/boards(?:-api)?\.greenhouse\.io\/v1\/boards\/([a-z0-9_-]+)/i)?.[1];
+  if (!board) return null;
+  return `https://boards-api.greenhouse.io/v1/boards/${board}/jobs/${jid}`;
+}
+
+function stripTags(s: string): string {
+  return s
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#39;|&rsquo;|&lsquo;/g, "'")
+    .replace(/&quot;|&ldquo;|&rdquo;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Distill a schema.org JobPosting JSON block down to the fields we care about.
+//
+// Some sites (REI's careers site among them) render the whole posting through
+// Javascript, so the readable body is nearly empty and the real content lives
+// only inside a JSON-LD blob that can run past 100KB. Keeping just the first
+// slice of that raw blob would cut off the description — and with it the salary,
+// which on those pages appears as text partway down the description rather than
+// in a structured field. Parsing the block and pulling the fields out keeps the
+// whole description while making the prompt smaller, not larger.
+function distillJobPosting(raw: string): string | null {
+  let data: unknown;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+
+  // A block can be a single node, an array, or wrapped in an @graph.
+  const nodes: Record<string, unknown>[] = Array.isArray(data)
+    ? (data as Record<string, unknown>[])
+    : ((data as Record<string, unknown>)["@graph"] as Record<string, unknown>[]) || [
+        data as Record<string, unknown>,
+      ];
+  const jp = nodes.find((n) => n && /JobPosting/i.test(String(n["@type"])));
+  if (!jp) return null;
+
+  const parts: string[] = [];
+  const str = (v: unknown) => (typeof v === "string" ? v : "");
+
+  if (jp.title) parts.push(`Title: ${stripTags(str(jp.title))}`);
+
+  const org = jp.hiringOrganization as Record<string, unknown> | string | undefined;
+  const orgName = typeof org === "string" ? org : str(org?.name as string);
+  if (orgName) parts.push(`Company: ${orgName}`);
+  const orgUrl = typeof org === "object" ? str(org?.url as string) : "";
+  if (orgUrl) parts.push(`Company website: ${orgUrl}`);
+
+  // Only surface a structured salary when it carries real numbers. A blank
+  // baseSalary (some sites emit zeros) would otherwise read as "the salary is 0"
+  // and suppress the real figure that's written into the description text.
+  const bs = jp.baseSalary as Record<string, unknown> | undefined;
+  const val = bs?.value as Record<string, unknown> | undefined;
+  const minV = Number(val?.minValue) || 0;
+  const maxV = Number(val?.maxValue) || 0;
+  const single = Number(val?.value) || 0;
+  if (minV > 0 || maxV > 0 || single > 0) {
+    const cur = str(bs?.currency) || "USD";
+    parts.push(
+      `Stated salary: ${cur} ${minV || single}${maxV ? ` to ${maxV}` : ""} per ${str(
+        val?.unitText
+      ).toLowerCase() || "year"}`
+    );
+  }
+
+  const loc = jp.jobLocation as Record<string, unknown> | Record<string, unknown>[] | undefined;
+  const firstLoc = Array.isArray(loc) ? loc[0] : loc;
+  const addr = firstLoc?.address as Record<string, unknown> | undefined;
+  if (addr) {
+    const bits = [addr.addressLocality, addr.addressRegion, addr.addressCountry]
+      .map((v) => str(v as string))
+      .filter(Boolean);
+    if (bits.length) parts.push(`Location: ${bits.join(", ")}`);
+  }
+  if (jp.employmentType) parts.push(`Employment type: ${stripTags(str(jp.employmentType))}`);
+
+  if (jp.description) parts.push(`\nDescription:\n${stripTags(str(jp.description))}`);
+  if (jp.qualifications) parts.push(`\nQualifications:\n${stripTags(str(jp.qualifications))}`);
+  if (jp.responsibilities) parts.push(`\nResponsibilities:\n${stripTags(str(jp.responsibilities))}`);
+
+  const out = parts.join("\n").trim();
+  return out.length > 40 ? out : null;
+}
+
 // Pull the human-readable content out of a fetched job page: any embedded
 // schema.org JobPosting JSON (most ATS/job sites include it) plus a plain-text
 // version of the body. We hand both to Claude so it can fill the form even when
@@ -90,8 +190,14 @@ function extractReadable(html: string): { jsonLd: string; text: string } {
     .replace(/\s+/g, " ")
     .trim();
 
+  // Prefer a parsed, distilled JobPosting (keeps the full description, salary
+  // included, in a fraction of the size). Fall back to the raw blocks only when
+  // none parse into something usable.
+  const distilled = jsonLdBlocks.map(distillJobPosting).filter(Boolean).join("\n\n");
+  const jsonLd = distilled || jsonLdBlocks.join("\n\n").slice(0, 30000);
+
   return {
-    jsonLd: jsonLdBlocks.join("\n\n").slice(0, 20000),
+    jsonLd: jsonLd.slice(0, 30000),
     // Cap the body so we don't send an enormous prompt; the top of a job page
     // holds the relevant content.
     text: text.slice(0, 18000),
@@ -176,6 +282,30 @@ export async function extractJobFromUrl(url: string): Promise<ExtractedJob> {
     // from JSON would be meaningless, so pass the body straight through as the
     // structured source instead.
     isJson = (res.headers.get("content-type") || "").includes("json");
+
+    // If the page is a Greenhouse embed shell, the content is only in the
+    // Greenhouse API. Follow it once, and use that JSON instead of the shell.
+    if (!isJson) {
+      const ghUrl = greenhouseApiFor(url, html);
+      if (ghUrl) {
+        try {
+          const res2 = await fetch(ghUrl, {
+            headers: {
+              "User-Agent":
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36",
+              Accept: "application/json",
+            },
+            redirect: "follow",
+          });
+          if (res2.ok) {
+            html = await res2.text();
+            isJson = true;
+          }
+        } catch {
+          /* couldn't reach the API — fall back to the shell HTML we already have */
+        }
+      }
+    }
   } catch (err) {
     if (err instanceof ExtractError) throw err;
     throw new ExtractError("Couldn't reach that page. Check the link, or fill the job in by hand.");
