@@ -43,6 +43,25 @@ export function readableUrlFor(url: string): string {
     if (m) return `https://jobs.apple.com/api/v1/jobDetails/${m[1]}`;
   }
 
+  // Workday-hosted career sites (L.L.Bean, Wasserman, and thousands of others on
+  // *.myworkdayjobs.com) render the posting in the browser, so the fetched HTML
+  // is an empty shell. Every Workday site exposes the same posting as JSON at a
+  // "/wday/cxs/<tenant>/<site>/job/<path>" endpoint. A public job URL looks like
+  // https://<tenant>.wdN.myworkdayjobs.com/[locale/]<site>/job/<path> — the site
+  // is the path segment right before "job" — so we rewrite it to that endpoint.
+  const wd = url.match(/^https?:\/\/([a-z0-9-]+\.wd\d+\.myworkdayjobs\.com)\/(.+)/i);
+  if (wd) {
+    const host = wd[1];
+    const tenant = host.split(".")[0];
+    const segs = wd[2].split(/[?#]/)[0].split("/").filter(Boolean);
+    const jobIdx = segs.indexOf("job");
+    if (jobIdx > 0) {
+      const site = segs[jobIdx - 1];
+      const rest = segs.slice(jobIdx).join("/");
+      return `https://${host}/wday/cxs/${tenant}/${site}/${rest}`;
+    }
+  }
+
   if (!/linkedin\.com/i.test(url)) return url;
   const m =
     url.match(/\/jobs\/view\/(\d+)/) ||
