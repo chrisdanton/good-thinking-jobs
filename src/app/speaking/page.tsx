@@ -51,8 +51,8 @@ const TALKS = [
   },
   {
     no: "05",
-    title: "Live for the Unscalable",
-    body: "As AI makes everything instant and infinite, the rarest thing becomes what can't be automated: participation, shared stakes, and belonging. A playbook for building brands people actually show up for.",
+    title: "GOOD HARD TRUTHS",
+    body: "You're too close to your own brand to see it clearly. This is us pointing the GOOD THINKING lens at yours: the honest read on how you're really perceived, the stuff your team feels but can't quite say, and 3 to 5 real actions to run with. Tough love, built to leave the room energized rather than audited.",
   },
 ];
 

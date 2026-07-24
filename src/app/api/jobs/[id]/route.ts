@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { Job, Department, LocationType, RoleLevel, Tier } from "@/lib/types";
 
+// Always read the job fresh from the database. Without this, Next.js caches the
+// Supabase read for this stable URL indefinitely, so a job edited or re-read
+// after it was first viewed keeps serving the old (sometimes empty) version.
+export const dynamic = "force-dynamic";
+
 function rowToJob(row: Record<string, unknown>): Job {
   return {
     id: row.id as string,

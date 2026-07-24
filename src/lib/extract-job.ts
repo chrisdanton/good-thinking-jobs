@@ -327,7 +327,11 @@ const schema = {
     title: { type: "string", description: "The job title, e.g. 'VP of Brand Marketing'" },
     companyName: { type: "string", description: "The hiring company's name" },
     companyWebsite: { type: "string", description: "The company's website URL, or empty string if unknown" },
-    location: { type: "string", description: "City/region, e.g. 'New York, NY' or 'United States'" },
+    location: {
+      type: "string",
+      description:
+        "The city and state/region only, e.g. 'New York, NY', 'Beaverton, OR', or 'London, UK'. Never include a street address, building name, ZIP/postal code, or 'HQ:' prefix — reduce a full address down to just the city and its two-letter state (or country). Use 'Remote' if the role is fully remote and no city is given, or 'United States' if only a country is stated.",
+    },
     locationType: { type: "string", enum: LOCATION_TYPES },
     department: { type: "string", enum: DEPARTMENTS },
     roleLevel: { type: "string", enum: ROLE_LEVELS },
@@ -445,7 +449,8 @@ Rules:
 - The only edits allowed on copied text: strip HTML tags, markdown and "*"/"-" bullet characters, drop navigation/cookie/footer boilerplate that isn't part of the posting, and normalize whitespace into readable lines and paragraphs.
 - If the posting is long, copy all of it. Length is not a problem; losing the company's language is.
 - "requirements": copy the qualifications/requirements section as written, one item per line. If the posting has no separate requirements section, leave it empty rather than inventing one by pulling lines out of the description.
-- "title", "companyName", "location": copy exactly as written on the posting.
+- "title", "companyName": copy exactly as written on the posting.
+- "location": give only the city and its state/region (e.g. "Beaverton, OR", "New York, NY", "London, UK"). Strip any street address, building/campus name, ZIP code, or "HQ:" label down to just the city and state/country. If the role is remote with no city, use "Remote".
 - "department", "roleLevel", "locationType": these are our board's own filing categories, so pick the closest option from the allowed list.
 - Salaries: annual USD as whole numbers, only if the posting states them. If no range is stated, use 0 for both. Never estimate a salary.
 - If a field is genuinely unknown, use an empty string (or 0 for salary). Never invent, infer, or fill a gap with plausible-sounding text.

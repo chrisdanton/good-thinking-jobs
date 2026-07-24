@@ -4,6 +4,9 @@ import { sendApprovalRequest } from "@/lib/email";
 import { Job, Department, LocationType, RoleLevel, Tier } from "@/lib/types";
 import { EXPIRY_DAYS, validateSalaryForTier, isPromoActive, isValidReferralCode } from "@/lib/constants";
 
+// Always read the live board; never serve a cached snapshot of the job list.
+export const dynamic = "force-dynamic";
+
 function rowToJob(row: Record<string, unknown>): Job {
   return {
     id: row.id as string,

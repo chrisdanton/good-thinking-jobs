@@ -44,24 +44,23 @@ export default function JobCard({ job }: { job: Job }) {
           </span>
         )}
 
-        {/* Type + Location */}
+        {/* What you scan for while scrolling: the brand, then the specific role,
+            then a small category tag. */}
         <div className="mb-4">
+          {/* Brand — leads the card */}
           <h3 className="text-2xl font-bold tracking-tight leading-tight font-display uppercase">
-            {job.roleLevel === "C-Suite" || job.roleLevel === "VP"
-              ? job.roleLevel
-              : job.department}
+            {job.companyName}
           </h3>
-          <p className="text-sm text-muted mt-0.5">
-            {job.location} / {job.locationType}
+          {/* Specific role */}
+          <p className="text-base font-bold mt-1 font-headline">{job.title}</p>
+          {/* Category tag + location, tertiary */}
+          <p className="text-xs text-muted mt-2 uppercase tracking-wider font-headline">
+            {job.department} · {job.location} / {job.locationType}
           </p>
         </div>
 
-        {/* Company */}
-        <p className="text-base font-bold mb-2 font-headline">{job.companyName}</p>
-
         {/* Teaser */}
         <p className="text-sm text-muted leading-relaxed mb-4 flex-1 font-secondary">
-          {job.companyName} is searching for a {job.title.toLowerCase()}.{" "}
           {teaser}
         </p>
 
