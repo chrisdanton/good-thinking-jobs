@@ -268,7 +268,7 @@ export async function sendLinkCheckReport(report: {
 
   await sendMail({
     to: DIGEST_RECIPIENT,
-    subject: `Job board link check: ${removed.length} removed, ${review.length} to review`,
+    subject: `Job board: removed ${removed.length} dead link${removed.length !== 1 ? "s" : ""}`,
     html: `
       <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 48px 44px; border: 1px solid #eeeeee;">
         <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
