@@ -65,9 +65,13 @@ export default function FixPage() {
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    // Phone keyboards love to add a trailing space or autocapitalise — trim so a
+    // stray space doesn't read as a wrong password.
+    const k = key.trim();
     try {
-      await load(key);
-      localStorage.setItem(KEY_STORAGE, key);
+      await load(k);
+      localStorage.setItem(KEY_STORAGE, k);
+      setKey(k);
       setAuthed(true);
     } catch {
       setError("Wrong password");
@@ -84,6 +88,10 @@ export default function FixPage() {
             type="password"
             inputMode="text"
             autoFocus
+            autoCapitalize="none"
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck={false}
             value={key}
             onChange={(e) => setKey(e.target.value)}
             placeholder="Password"
