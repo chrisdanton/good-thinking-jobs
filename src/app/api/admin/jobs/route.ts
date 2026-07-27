@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { Job, Department, LocationType, RoleLevel, Tier, JobStatus } from "@/lib/types";
+import { LOCATION_TYPES, DEPARTMENTS, ROLE_LEVELS } from "@/lib/constants";
+import { cleanCompanyName } from "@/lib/extract-job";
 
 function rowToJob(row: Record<string, unknown>): Job {
   return {
@@ -54,8 +56,10 @@ export async function GET(req: NextRequest) {
   return NextResponse.json((data || []).map(rowToJob));
 }
 
-// PATCH /api/admin/jobs — update a job's status or newsletter flag
-// body: { key, id, status?, flaggedForNewsletter? }
+// PATCH /api/admin/jobs — update a job's status, newsletter flag, or the common
+// quick-fix fields (company name, title, location, salary) used by the /fix page.
+// body: { key, id, status?, flaggedForNewsletter?, companyName?, title?,
+//         location?, locationType?, salaryMin?, salaryMax?, department?, roleLevel? }
 export async function PATCH(req: NextRequest) {
   const body = await req.json();
   if (!authorized(body.key)) {
@@ -68,6 +72,30 @@ export async function PATCH(req: NextRequest) {
   const updates: Record<string, unknown> = {};
   if (typeof body.status === "string") updates.status = body.status;
   if (typeof body.flaggedForNewsletter === "boolean") updates.flagged_for_newsletter = body.flaggedForNewsletter;
+
+  // Quick-fix text fields. Only applied when the key is present, so a field left
+  // untouched is never blanked. Company name is de-junked (Workday entity codes).
+  if (typeof body.companyName === "string" && body.companyName.trim()) {
+    updates.company_name = cleanCompanyName(body.companyName);
+  }
+  if (typeof body.title === "string" && body.title.trim()) {
+    updates.title = body.title.trim();
+  }
+  if (typeof body.location === "string" && body.location.trim()) {
+    updates.location = body.location.trim();
+  }
+  if (typeof body.locationType === "string" && (LOCATION_TYPES as readonly string[]).includes(body.locationType)) {
+    updates.location_type = body.locationType;
+  }
+  if (typeof body.department === "string" && (DEPARTMENTS as readonly string[]).includes(body.department)) {
+    updates.department = body.department;
+  }
+  if (typeof body.roleLevel === "string" && (ROLE_LEVELS as readonly string[]).includes(body.roleLevel)) {
+    updates.role_level = body.roleLevel;
+  }
+  // Salary: a sent value wins, including 0 to clear it back to "not listed".
+  if (body.salaryMin !== undefined) updates.salary_min = Math.max(0, Math.round(Number(body.salaryMin) || 0));
+  if (body.salaryMax !== undefined) updates.salary_max = Math.max(0, Math.round(Number(body.salaryMax) || 0));
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
