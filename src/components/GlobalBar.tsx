@@ -39,21 +39,30 @@ export default function GlobalBar() {
           })}
         </nav>
 
-        {/* Mobile hamburger */}
+        {/* Mobile menu button */}
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
-          className="sm:hidden justify-self-start flex flex-col justify-center gap-[5px] w-9 h-9 -ml-1"
+          style={{ color: "#ffffff" }}
+          className="sm:hidden justify-self-start flex items-center gap-2 px-2 py-1.5 text-[12px] uppercase tracking-[0.14em] font-bold -ml-1"
         >
-          <span
-            className={`block h-[2px] w-6 bg-white transition-transform ${open ? "translate-y-[7px] rotate-45" : ""}`}
-          />
-          <span className={`block h-[2px] w-6 bg-white transition-opacity ${open ? "opacity-0" : ""}`} />
-          <span
-            className={`block h-[2px] w-6 bg-white transition-transform ${open ? "-translate-y-[7px] -rotate-45" : ""}`}
-          />
+          <span className="flex flex-col gap-[4px]">
+            <span
+              className={`block h-[2.5px] w-5 transition-transform ${open ? "translate-y-[6.5px] rotate-45" : ""}`}
+              style={{ backgroundColor: "#ffffff" }}
+            />
+            <span
+              className={`block h-[2.5px] w-5 transition-opacity ${open ? "opacity-0" : ""}`}
+              style={{ backgroundColor: "#ffffff" }}
+            />
+            <span
+              className={`block h-[2.5px] w-5 transition-transform ${open ? "-translate-y-[6.5px] -rotate-45" : ""}`}
+              style={{ backgroundColor: "#ffffff" }}
+            />
+          </span>
+          {open ? "Close" : "Menu"}
         </button>
 
         <a

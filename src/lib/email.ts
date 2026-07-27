@@ -291,6 +291,132 @@ export async function sendLinkCheckReport(report: {
   });
 }
 
+// Email 6: Phone-flag result — sent to Chris after he flags a job from his
+// phone. Confirms what was changed automatically, and surfaces anything the flag
+// couldn't act on so it doesn't get silently dropped.
+export async function sendFlagResult(params: {
+  jobId: string;
+  title: string;
+  company: string;
+  labels: string[];
+  leftover: string;
+  removed: boolean;
+}) {
+  const { jobId, title, company, labels, leftover, removed } = params;
+  const jobUrl = `${BASE_URL}/jobs/${jobId}`;
+
+  const changesBlock = labels.length
+    ? `<p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 0 0 8px; font-weight: 700;">Applied</p>
+       <ul style="margin: 0 0 24px; padding-left: 18px;">
+         ${labels.map((l) => `<li style="font-size: 15px; color: #111; line-height: 1.7;">${l}</li>`).join("")}
+       </ul>`
+    : `<p style="font-size: 15px; color: #555; line-height: 1.7; margin: 0 0 24px;">Nothing was changed automatically.</p>`;
+
+  const leftoverBlock = leftover
+    ? `<div style="background: #fffde6; border: 1px solid #f0ee99; padding: 20px; margin: 0 0 24px;">
+         <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #111; margin: 0 0 8px; font-weight: 700;">Needs your eye</p>
+         <p style="font-size: 14px; color: #555; line-height: 1.6; margin: 0;">Couldn't auto-apply this part of your note: "${leftover}"</p>
+       </div>`
+    : "";
+
+  await sendMail({
+    to: DIGEST_RECIPIENT,
+    subject: `Job flag ${removed ? "— removed" : "applied"}: ${company} · ${title}`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 48px 44px; border: 1px solid #eeeeee;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
+
+        <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 8px; color: #111; line-height: 1.2;">
+          Flag ${removed ? "processed" : "applied"}
+        </h1>
+        <p style="font-size: 15px; color: #555; line-height: 1.7; margin: 0 0 28px;">
+          <strong>${title}</strong> at <strong>${company}</strong>
+        </p>
+
+        ${changesBlock}
+        ${leftoverBlock}
+
+        ${removed ? "" : `<p style="margin: 0 0 8px;"><a href="${jobUrl}" style="font-size: 15px; font-weight: 700; color: #111; text-decoration: none; border-bottom: 2px solid #F9FF00; padding-bottom: 2px;">View listing &rarr;</a></p>`}
+
+        <p style="font-size: 13px; color: #888; line-height: 1.65; margin: 28px 0 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
+          Sent because you flagged this from your phone.<br><br>GOOD THINKING · The weekly briefing on brand, culture, and marketing.
+        </p>
+      </div>
+    `,
+  });
+}
+
+// Email 7: Weekly usage report — sent to Chris so he can see whether the board
+// is being used. Reports the activity we can measure directly from our own data
+// (live listings, what's new, applications submitted through the board). Real
+// visitor pageviews live in Vercel Analytics, which needs a token to read; until
+// that's connected the report says so rather than pretending to have the number.
+export async function sendUsageReport(params: {
+  activeCount: number;
+  newThisWeek: { company: string; title: string; id: string }[];
+  applicationsThisWeek: number;
+  applicationsTotal: number;
+  trafficConnected: boolean;
+}) {
+  const { activeCount, newThisWeek, applicationsThisWeek, applicationsTotal, trafficConnected } =
+    params;
+
+  const stat = (n: number | string, label: string) => `
+    <td style="padding: 0 8px; text-align: center;">
+      <div style="font-size: 34px; font-weight: 700; color: #111; line-height: 1;">${n}</div>
+      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-top: 6px;">${label}</div>
+    </td>`;
+
+  const newBlock = newThisWeek.length
+    ? `<p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 32px 0 10px; font-weight: 700;">Added this week (${newThisWeek.length})</p>
+       <table style="width: 100%; border-collapse: collapse;">
+         ${newThisWeek
+           .map(
+             (j) => `<tr style="border-bottom: 1px solid #eee;"><td style="padding: 10px 0;">
+               <span style="font-size: 14px; font-weight: 600; color: #111;">${j.company}</span>
+               <span style="font-size: 14px; color: #666;"> · ${j.title}</span>
+             </td></tr>`
+           )
+           .join("")}
+       </table>`
+    : `<p style="font-size: 14px; color: #888; margin: 32px 0 0;">No new listings added in the last 7 days.</p>`;
+
+  const trafficBlock = trafficConnected
+    ? ""
+    : `<div style="background: #f7f7f5; border: 1px dashed #ccc; padding: 20px; margin: 28px 0 0;">
+         <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 0 0 8px; font-weight: 700;">Visitor traffic — not connected yet</p>
+         <p style="font-size: 14px; color: #555; line-height: 1.6; margin: 0;">This report shows board activity from our own data. To add real page-view traffic (how many people visited, which jobs got the most views), the numbers live in Vercel Analytics and need a token to read. Ask Claude to wire it up and it'll appear here.</p>
+       </div>`;
+
+  await sendMail({
+    to: DIGEST_RECIPIENT,
+    subject: `Job board weekly: ${activeCount} live, ${applicationsThisWeek} application${applicationsThisWeek !== 1 ? "s" : ""} this week`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 48px 44px; border: 1px solid #eeeeee;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
+
+        <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 24px; color: #111; line-height: 1.2;">
+          This week on the board
+        </h1>
+
+        <table style="width: 100%; border-collapse: collapse; margin: 0 0 8px;"><tr>
+          ${stat(activeCount, "Live listings")}
+          ${stat(newThisWeek.length, "Added this week")}
+          ${stat(applicationsThisWeek, "Applied this week")}
+          ${stat(applicationsTotal, "Applied all time")}
+        </tr></table>
+
+        ${newBlock}
+        ${trafficBlock}
+
+        <p style="font-size: 13px; color: #888; line-height: 1.65; margin: 32px 0 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
+          "Applied" counts applications sent through the board's own apply form; jobs that link out to a company site are applied to there and aren't counted. Manage everything in the <a href="${BASE_URL}/admin" style="color: #111; border-bottom: 2px solid #F9FF00; text-decoration: none;">admin panel</a>.<br><br>GOOD THINKING · The weekly briefing on brand, culture, and marketing.
+        </p>
+      </div>
+    `,
+  });
+}
+
 // Joins a list into natural English: ["a","b","c"] -> "a, b and c".
 function joinNatural(items: string[]): string {
   if (items.length === 0) return "";

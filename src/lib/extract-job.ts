@@ -20,6 +20,25 @@ export interface ExtractedJob {
   externalApplyUrl: string;
 }
 
+// Some applicant-tracking systems — Workday most of all — expose the hiring
+// company as the internal legal entity that runs payroll rather than the brand
+// a candidate would recognise. One artifact is mechanical enough to strip with
+// certainty: a leading numeric cost-centre / entity code, e.g. Workday handing
+// back "1012 LEGO Systems, Inc." where the name is plainly "LEGO Systems, Inc."
+// No real brand begins with a bare 3-to-5-digit number followed by a space
+// ("3M", "7 For All Mankind", "1-800-Flowers", "23andMe" all fail that shape),
+// so removing it can't clobber a legitimate name.
+//
+// Legal-shell names that share no words with the brand — "Cruise Yacht OpCo Ltd
+// (Miami Branch)" for the Ritz-Carlton Yacht Collection — can't be mapped to the
+// brand without reading the posting, so those are left to the model (its prompt
+// now asks it to prefer the consumer brand); this function only does the safe,
+// deterministic cleanup.
+export function cleanCompanyName(name: string): string {
+  const out = (name || "").trim().replace(/^\d{3,5}\s+(?=[A-Za-z])/, "");
+  return out.replace(/\s+/g, " ").trim();
+}
+
 // A failure we can explain to a human, rather than a stack trace.
 export class ExtractError extends Error {
   status: number;
@@ -449,7 +468,8 @@ Rules:
 - The only edits allowed on copied text: strip HTML tags, markdown and "*"/"-" bullet characters, drop navigation/cookie/footer boilerplate that isn't part of the posting, and normalize whitespace into readable lines and paragraphs.
 - If the posting is long, copy all of it. Length is not a problem; losing the company's language is.
 - "requirements": copy the qualifications/requirements section as written, one item per line. If the posting has no separate requirements section, leave it empty rather than inventing one by pulling lines out of the description.
-- "title", "companyName": copy exactly as written on the posting.
+- "title": copy exactly as written on the posting.
+- "companyName": the name the company is known by to candidates. Copy it as written, EXCEPT when the page gives an internal legal/payroll entity instead of the brand — a holding company, an "OpCo"/"HoldCo" shell, a "... (X Branch)" registration, or a name prefixed with a numeric cost-centre code. In that case use the consumer brand when it is clear from the posting. E.g. prefer "The Ritz-Carlton Yacht Collection" over "Cruise Yacht OpCo Ltd (Miami Branch)", and "LEGO Systems, Inc." over "1012 LEGO Systems, Inc." Never invent a brand you can't see on the page; if only the legal entity is given, keep it.
 - "location": give only the city and its state/region (e.g. "Beaverton, OR", "New York, NY", "London, UK"). Strip any street address, building/campus name, ZIP code, or "HQ:" label down to just the city and state/country. If the role is remote with no city, use "Remote".
 - "department", "roleLevel", "locationType": these are our board's own filing categories, so pick the closest option from the allowed list.
 - Salaries: annual USD as whole numbers, only if the posting states them. If no range is stated, use 0 for both. Never estimate a salary.
@@ -487,5 +507,7 @@ ${jsonLd ? `Structured job data found on the page (most reliable):\n${jsonLd}\n\
   const fields = JSON.parse(textBlock.text) as ExtractedJob;
   // Default the apply link to the original posting.
   fields.externalApplyUrl = url;
+  // Strip Workday-style entity codes the model may have copied verbatim.
+  fields.companyName = cleanCompanyName(fields.companyName);
   return fields;
 }

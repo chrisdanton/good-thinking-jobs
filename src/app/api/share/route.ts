@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { extractJobFromUrl, ExtractError } from "@/lib/extract-job";
 import { publishCuratedJob, findExistingByApplyUrl } from "@/lib/publish-curated";
+import { applyFlag } from "@/lib/apply-flag";
 
-// POST/GET /api/share  { token, url }
+// POST/GET /api/share  { token, url, note? }
 //
 // The phone endpoint. An iOS Shortcut in the share sheet sends a job link here
 // from the LinkedIn app; we read the posting and publish it to the board in one
 // step, then hand back a short human-readable message the Shortcut shows as a
 // notification. No admin login, no typing.
+//
+// If the share also carries a `note` ("salary 166k-276k", "company should be
+// LEGO", "take it down"), it's treated as a FIX to an existing job rather than a
+// new post — so Chris's one Shortcut does both: leave the note blank to post,
+// type a note to correct a job already on the board. See applyFlag / flag-note.ts.
 //
 // Auth is a single long random token (SHARE_TOKEN) stored inside the Shortcut.
 // It is deliberately separate from ADMIN_PASSWORD: this token only ever reaches
@@ -38,7 +44,7 @@ function firstUrlIn(raw: string): string {
   return m[0].replace(/[.,;)\]]+$/, "");
 }
 
-async function handle(token: string, rawUrl: string) {
+async function handle(token: string, rawUrl: string, note: string) {
   if (!process.env.SHARE_TOKEN) {
     return NextResponse.json(
       { ok: false, message: "Sharing isn't set up yet — add a SHARE_TOKEN in Vercel." },
@@ -47,6 +53,15 @@ async function handle(token: string, rawUrl: string) {
   }
   if (!tokenMatches(token)) {
     return NextResponse.json({ ok: false, message: "Not authorized." }, { status: 401 });
+  }
+
+  // A note means "fix an existing job", not "post a new one".
+  if (note.trim()) {
+    const result = await applyFlag(rawUrl, note);
+    return NextResponse.json(
+      { ok: result.ok, id: result.id, applied: result.applied, message: result.message },
+      { status: result.status }
+    );
   }
 
   const url = firstUrlIn(rawUrl);
@@ -89,11 +104,15 @@ async function handle(token: string, rawUrl: string) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({} as Record<string, unknown>));
-  return handle(String(body.token || ""), String(body.url || body.text || ""));
+  return handle(
+    String(body.token || ""),
+    String(body.url || body.text || ""),
+    String(body.note || body.fix || "")
+  );
 }
 
 // Also allow GET so the whole thing can be tested by pasting a link in a browser.
 export async function GET(req: NextRequest) {
   const p = req.nextUrl.searchParams;
-  return handle(p.get("token") || "", p.get("url") || "");
+  return handle(p.get("token") || "", p.get("url") || "", p.get("note") || "");
 }
