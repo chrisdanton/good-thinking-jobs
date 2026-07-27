@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
-import { sendLinkCheckReport } from "@/lib/email";
+import { sendLinkCheckReport, sendDeadLinkNotice } from "@/lib/email";
+import { CURATED_POSTER_NAME } from "@/lib/constants";
 import { looksExpired } from "@/lib/title-match";
 import { readableUrlFor } from "@/lib/extract-job";
+import { Job } from "@/lib/types";
 
 interface CheckedJob {
   id: string;
@@ -102,7 +104,7 @@ export async function GET(req: NextRequest) {
   const sb = getSupabase();
   const { data, error } = await sb
     .from("jobs")
-    .select("id, title, company_name, external_apply_url, status")
+    .select("id, title, company_name, external_apply_url, status, poster_name, poster_email")
     .eq("status", "active")
     .gt("expires_at", new Date().toISOString());
 
@@ -124,16 +126,39 @@ export async function GET(req: NextRequest) {
       continue;
     }
 
-    // Definitely gone — remove it (any tier; Chris wants dead links pulled, full
-    // stop). Live jobs are never touched, so a paid listing only ever gets pulled
-    // when its own link is genuinely dead.
+    // Definitely gone — remove it. Live jobs are never touched, so a listing only
+    // gets pulled when its own link is genuinely dead.
     if (!dryRun) await sb.from("jobs").update({ status: "removed" }).eq("id", j.id);
+
+    // An employer who posted this themselves gets a friendly heads-up with a free
+    // repost offer; GOOD THINKING's own curated listings are pulled quietly.
+    const isCurated = j.poster_name === CURATED_POSTER_NAME;
+    const posterEmail = String(j.poster_email || "");
+    let note = `${reason}. Removed automatically.`;
+    if (!isCurated && /@/.test(posterEmail)) {
+      if (!dryRun) {
+        try {
+          await sendDeadLinkNotice({
+            title: j.title,
+            companyName: j.company_name,
+            posterEmail,
+          } as Job);
+          note += ` Poster (${posterEmail}) notified with a free-repost offer.`;
+        } catch (err) {
+          console.error("Failed to send dead-link notice:", err);
+          note += ` Couldn't reach the poster (${posterEmail}).`;
+        }
+      } else {
+        note += ` Would notify poster (${posterEmail}).`;
+      }
+    }
+
     removed.push({
       id: j.id as string,
       title: j.title as string,
       company: j.company_name as string,
       url,
-      reason: `${reason}. Removed automatically.`,
+      reason: note,
     });
   }
 

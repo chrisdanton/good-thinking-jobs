@@ -199,6 +199,36 @@ export async function sendDeniedEmail(job: Job) {
   });
 }
 
+// Email 3b: Poster — their apply link looks dead and the listing was pulled.
+// Sent only for employer-submitted listings (not GOOD THINKING's own curated
+// ones), with a friendly offer to repost free if it's a mistake.
+export async function sendDeadLinkNotice(job: Job) {
+  await sendMail({
+    to: job.posterEmail,
+    subject: `A quick note about your listing on GOOD THINKING Jobs`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 48px 44px; border: 1px solid #eeeeee;">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #111; padding-bottom: 20px; border-bottom: 2px solid #111; display: inline-block;">GOOD THINKING JOBS</div>
+
+        <h1 style="font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 20px; color: #111; line-height: 1.2;">
+          Your job link looks inactive.
+        </h1>
+
+        <p style="font-size: 16px; color: #333333; line-height: 1.7; margin: 0 0 16px;">
+          The apply link for <strong>${job.title}</strong> at <strong>${job.companyName}</strong> that you posted on GOOD THINKING Jobs no longer seems to be active, so we've flagged it for removal. Nobody likes a dead link, and we want the board to stay useful for everyone reading it.
+        </p>
+        <p style="font-size: 16px; color: #555555; line-height: 1.7; margin: 0 0 28px;">
+          If you think this is an error, no worries at all. Just reply to this email or reach us at <a href="mailto:goodjobs@weareingoodco.com" style="color: #111; font-weight: 600;">goodjobs@weareingoodco.com</a> and we'll repost it and restart your 30-day clock, free of charge.
+        </p>
+
+        <p style="font-size: 13px; color: #888888; line-height: 1.65; margin: 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
+          GOOD THINKING · The weekly briefing on brand, culture, and marketing.
+        </p>
+      </div>
+    `,
+  });
+}
+
 // Email 4: Friday newsletter digest — sent to Chris to prep the Sunday letter.
 const DIGEST_RECIPIENT = "chris@weareingoodco.com";
 
