@@ -356,16 +356,45 @@ export async function sendUsageReport(params: {
   newThisWeek: { company: string; title: string; id: string }[];
   applicationsThisWeek: number;
   applicationsTotal: number;
-  trafficConnected: boolean;
+  traffic: {
+    connected: boolean;
+    pageviews7d: number;
+    visitors7d: number;
+    topPages: { route: string; pageviews: number }[];
+  };
 }) {
-  const { activeCount, newThisWeek, applicationsThisWeek, applicationsTotal, trafficConnected } =
-    params;
+  const { activeCount, newThisWeek, applicationsThisWeek, applicationsTotal, traffic } = params;
+  const trafficConnected = traffic.connected;
 
   const stat = (n: number | string, label: string) => `
     <td style="padding: 0 8px; text-align: center;">
       <div style="font-size: 34px; font-weight: 700; color: #111; line-height: 1;">${n}</div>
       <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-top: 6px;">${label}</div>
     </td>`;
+
+  // Real visitor traffic (Vercel Web Analytics), shown when connected.
+  const trafficConnectedBlock = trafficConnected
+    ? `<p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 32px 0 12px; font-weight: 700;">Visitor traffic · last 7 days</p>
+       <table style="width: 100%; border-collapse: collapse; margin: 0 0 8px;"><tr>
+         ${stat(traffic.pageviews7d.toLocaleString(), "Page views")}
+         ${stat(traffic.visitors7d.toLocaleString(), "Visitors")}
+       </tr></table>
+       ${
+         traffic.topPages.length
+           ? `<p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 24px 0 8px; font-weight: 700;">Most-viewed pages</p>
+              <table style="width: 100%; border-collapse: collapse;">
+                ${traffic.topPages
+                  .map(
+                    (p) => `<tr style="border-bottom: 1px solid #eee;">
+                      <td style="padding: 8px 0; font-size: 14px; color: #111;">${p.route}</td>
+                      <td style="padding: 8px 0; font-size: 14px; color: #666; text-align: right;">${p.pageviews.toLocaleString()} views</td>
+                    </tr>`
+                  )
+                  .join("")}
+              </table>`
+           : ""
+       }`
+    : "";
 
   const newBlock = newThisWeek.length
     ? `<p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 32px 0 10px; font-weight: 700;">Added this week (${newThisWeek.length})</p>
@@ -407,6 +436,7 @@ export async function sendUsageReport(params: {
         </tr></table>
 
         ${newBlock}
+        ${trafficConnectedBlock}
         ${trafficBlock}
 
         <p style="font-size: 13px; color: #888; line-height: 1.65; margin: 32px 0 0; border-top: 1px solid #eeeeee; padding-top: 24px;">

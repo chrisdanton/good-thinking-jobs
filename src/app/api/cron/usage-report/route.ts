@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { sendUsageReport } from "@/lib/email";
+import { getWeeklyTraffic } from "@/lib/vercel-analytics";
 
 // GET /api/cron/usage-report
 // Runs weekly (see vercel.json). Emails Chris a snapshot of how the board is
@@ -54,13 +55,16 @@ export async function GET(req: NextRequest) {
     .select("*", { count: "exact", head: true })
     .gte("created_at", weekAgo);
 
+  // Real visitor traffic from Vercel Web Analytics (quietly off if the token
+  // isn't set or Web Analytics isn't enabled on the project yet).
+  const traffic = await getWeeklyTraffic();
+
   const payload = {
     activeCount: activeCount ?? 0,
     newThisWeek,
     applicationsThisWeek: applicationsThisWeek ?? 0,
     applicationsTotal: applicationsTotal ?? 0,
-    // Wire this to true once a Vercel Analytics token is added and read here.
-    trafficConnected: false,
+    traffic,
   };
 
   if (!dryRun) {
