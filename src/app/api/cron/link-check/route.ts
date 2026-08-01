@@ -37,7 +37,7 @@ interface CheckResult {
 // for JSON as well as HTML — Workday's career sites 406 an HTML-only request but
 // return the posting (200) or a clean 404 when asked for their JSON endpoint,
 // which is what made every Workday listing look "unconfirmable" before.
-async function checkLink(url: string): Promise<CheckResult> {
+async function checkOnce(url: string): Promise<CheckResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
   const fetchUrl = readableUrlFor(url);
@@ -84,6 +84,19 @@ async function checkLink(url: string): Promise<CheckResult> {
   } finally {
     clearTimeout(timer);
   }
+}
+
+// A single 404 or error can be transient (a rate limit, a momentary server
+// hiccup, a CDN blip) — and this cron auto-removes dead links, so acting on one
+// bad read could pull a live job. Real example: Sesame Workshop's careers page
+// returned a one-off 404 that cleared on the next request. So a "dead" verdict is
+// only trusted when a second look, a couple seconds later, agrees.
+async function checkLink(url: string): Promise<CheckResult> {
+  const first = await checkOnce(url);
+  if (first.verdict !== "dead") return first;
+  await new Promise((r) => setTimeout(r, 2500));
+  const second = await checkOnce(url);
+  return second.verdict === "dead" ? second : { verdict: "alive", reason: "" };
 }
 
 // GET /api/cron/link-check
