@@ -37,6 +37,39 @@ interface CheckResult {
 // for JSON as well as HTML — Workday's career sites 406 an HTML-only request but
 // return the posting (200) or a clean 404 when asked for their JSON endpoint,
 // which is what made every Workday listing look "unconfirmable" before.
+// Is the host itself reachable? A genuinely dead posting 404s while its careers
+// site stays up; some hosts (JobScore, for one) instead 404 our datacenter IP for
+// EVERYTHING, so a live job looks dead. Checking the host root tells the two
+// apart: root reachable => the 404 is really about this posting; root also
+// blocked => we're being blocked, so don't trust the 404.
+async function originReachable(fetchUrl: string): Promise<boolean> {
+  let origin: string;
+  try {
+    origin = new URL(fetchUrl).origin;
+  } catch {
+    return true;
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(origin, {
+      method: "GET",
+      redirect: "follow",
+      signal: controller.signal,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml",
+      },
+    });
+    return res.status < 400;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function checkOnce(url: string): Promise<CheckResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
@@ -61,7 +94,12 @@ async function checkOnce(url: string): Promise<CheckResult> {
     });
 
     if (res.status === 404 || res.status === 410) {
-      return { verdict: "dead", reason: "Link returned 'not found'" };
+      // Trust a 404 only if the host is otherwise up (see originReachable). If the
+      // whole host is blocking our IP, keep the job rather than pull a live one.
+      if (await originReachable(fetchUrl)) {
+        return { verdict: "dead", reason: "Link returned 'not found'" };
+      }
+      return { verdict: "alive", reason: "" };
     }
     // Any other non-OK status (403/406 bot-blocks, 5xx, rate limits) means we
     // couldn't read the page — not that the job is gone. Keep it, stay quiet.
