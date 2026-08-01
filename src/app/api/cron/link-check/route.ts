@@ -41,6 +41,11 @@ async function checkOnce(url: string): Promise<CheckResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
   const fetchUrl = readableUrlFor(url);
+  // Only Workday's CXS JSON endpoint needs a JSON Accept header (without it, it
+  // 406s). Sending JSON-first to ordinary career pages backfires: JobScore, for
+  // one, answers a JSON-preferring request with a 404 even though the posting is
+  // live, which would wrongly mark the job dead. So ask for JSON only for CXS.
+  const isCxs = fetchUrl.includes("/wday/cxs/");
   try {
     const res = await fetch(fetchUrl, {
       method: "GET",
@@ -49,7 +54,9 @@ async function checkOnce(url: string): Promise<CheckResult> {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36",
-        Accept: "application/json, text/html,application/xhtml+xml",
+        Accept: isCxs
+          ? "application/json, text/html,application/xhtml+xml"
+          : "text/html,application/xhtml+xml",
       },
     });
 
