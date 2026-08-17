@@ -392,15 +392,57 @@ export async function sendUsageReport(params: {
     visitors7d: number;
     topPages: { route: string; pageviews: number }[];
   };
+  engagement?: {
+    connected: boolean;
+    views: number;
+    applyClicks: number;
+    uniqueVisitors: number;
+    ctr: number;
+    topJobs: { company: string; title: string; views: number; applyClicks: number; ctr: number }[];
+  };
 }) {
-  const { activeCount, newThisWeek, applicationsThisWeek, applicationsTotal, traffic } = params;
+  const { activeCount, newThisWeek, applicationsThisWeek, applicationsTotal, traffic, engagement } = params;
   const trafficConnected = traffic.connected;
+  const pct = (r: number) => `${(r * 100).toFixed(1)}%`;
 
   const stat = (n: number | string, label: string) => `
     <td style="padding: 0 8px; text-align: center;">
       <div style="font-size: 34px; font-weight: 700; color: #111; line-height: 1;">${n}</div>
       <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-top: 6px;">${label}</div>
     </td>`;
+
+  // Our own job-level engagement: views of job pages and click-throughs to apply,
+  // with the click-through rate Vercel Analytics can't give us per job.
+  const engagementBlock =
+    engagement && engagement.connected
+      ? `<p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 32px 0 12px; font-weight: 700;">Job engagement · last 7 days</p>
+         <table style="width: 100%; border-collapse: collapse; margin: 0 0 8px;"><tr>
+           ${stat(engagement.views.toLocaleString(), "Job views")}
+           ${stat(engagement.applyClicks.toLocaleString(), "Apply clicks")}
+           ${stat(pct(engagement.ctr), "Click-through")}
+           ${stat(engagement.uniqueVisitors.toLocaleString(), "Unique visitors")}
+         </tr></table>
+         ${
+           engagement.topJobs.length
+             ? `<p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 24px 0 8px; font-weight: 700;">Most-viewed jobs</p>
+                <table style="width: 100%; border-collapse: collapse;">
+                  ${engagement.topJobs
+                    .map(
+                      (j) => `<tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 8px 0; font-size: 14px; color: #111;"><span style="font-weight: 600;">${j.company}</span><span style="color: #666;"> · ${j.title}</span></td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #666; text-align: right; white-space: nowrap;">${j.views.toLocaleString()} views · ${pct(j.ctr)} CTR</td>
+                      </tr>`
+                    )
+                    .join("")}
+                </table>`
+             : ""
+         }`
+      : engagement // present but not connected → table not set up yet
+      ? `<div style="background: #f7f7f5; border: 1px dashed #ccc; padding: 20px; margin: 28px 0 0;">
+           <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin: 0 0 8px; font-weight: 700;">Job engagement — one setup step left</p>
+           <p style="font-size: 14px; color: #555; line-height: 1.6; margin: 0;">View and apply-click tracking is deployed, but the job_events table hasn't been created in Supabase yet. Once it's added, most-viewed jobs and click-through rate appear here.</p>
+         </div>`
+      : "";
 
   // Real visitor traffic (Vercel Web Analytics), shown when connected.
   const trafficConnectedBlock = trafficConnected
@@ -467,6 +509,7 @@ export async function sendUsageReport(params: {
 
         ${newBlock}
         ${trafficConnectedBlock}
+        ${engagementBlock}
         ${trafficBlock}
 
         <p style="font-size: 13px; color: #888; line-height: 1.65; margin: 32px 0 0; border-top: 1px solid #eeeeee; padding-top: 24px;">

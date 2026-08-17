@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import FeaturedBadge from "@/components/FeaturedBadge";
 import { Job } from "@/lib/types";
+import { trackJobEvent } from "@/lib/track";
 
 function formatSalary(min: number, max: number): string {
   if (!min && !max) return "Salary not listed";
@@ -32,7 +33,12 @@ export default function JobDetailPage() {
   useEffect(() => {
     fetch(`/api/jobs/${params.id}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => { setJob(data); setLoading(false); })
+      .then((data) => {
+        setJob(data);
+        setLoading(false);
+        // Count a view once we know it's a real, found job.
+        if (data?.id) trackJobEvent(data.id, "view");
+      })
       .catch(() => setLoading(false));
   }, [params.id]);
 
@@ -89,7 +95,7 @@ export default function JobDetailPage() {
 
       <div className="mb-10">
         {job.externalApplyUrl && (
-          <a href={job.externalApplyUrl} target="_blank" rel="noopener noreferrer" className="inline-block bg-accent text-black text-sm font-bold uppercase tracking-wider font-headline px-8 py-3 hover:bg-accent/90 transition-colors">
+          <a href={job.externalApplyUrl} onClick={() => trackJobEvent(job.id, "apply_click")} target="_blank" rel="noopener noreferrer" className="inline-block bg-accent text-black text-sm font-bold uppercase tracking-wider font-headline px-8 py-3 hover:bg-accent/90 transition-colors">
             Apply on Company Site
           </a>
         )}
@@ -111,7 +117,7 @@ export default function JobDetailPage() {
         <div>Posted {formatDate(job.createdAt)} &middot; Expires {formatDate(job.expiresAt)}</div>
         <div>
           {job.externalApplyUrl && (
-            <a href={job.externalApplyUrl} target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-2 font-medium">
+            <a href={job.externalApplyUrl} onClick={() => trackJobEvent(job.id, "apply_click")} target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-2 font-medium">
               Apply on company site &rarr;
             </a>
           )}
