@@ -41,10 +41,66 @@ export default function PostJobPage() {
   const [checkoutError, setCheckoutError] = useState("");
   const [salaryError, setSalaryError] = useState("");
   const [referralError, setReferralError] = useState("");
+  const [autofillUrl, setAutofillUrl] = useState("");
+  const [autofilling, setAutofilling] = useState(false);
+  const [autofillNote, setAutofillNote] = useState("");
+  const [autofillDone, setAutofillDone] = useState(false);
 
   const update = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
+
+  // Auto-fill: paste a link to an existing job posting and let the reader fill in
+  // as many fields as it can. The poster then reviews and edits before posting.
+  // Reading fails on some sites (heavy Javascript, logins, odd link formats), so
+  // a friendly note explains that and the form stays editable by hand.
+  async function handleAutofill() {
+    const url = autofillUrl.trim();
+    if (!/^https?:\/\//i.test(url)) {
+      setAutofillNote("Paste a full link starting with http.");
+      return;
+    }
+    setAutofilling(true);
+    setAutofillNote("");
+    setAutofillDone(false);
+    try {
+      const res = await fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAutofillNote(
+          "Oy, sorry, we tried. Something about your link makes it so we can't auto-populate this one. Go ahead and fill it in below."
+        );
+        return;
+      }
+      setForm((prev) => ({
+        ...prev,
+        companyName: data.companyName || prev.companyName,
+        companyWebsite: data.companyWebsite || prev.companyWebsite,
+        title: data.title || prev.title,
+        department: (data.department as Department) || prev.department,
+        location: data.location || prev.location,
+        locationType: (data.locationType as LocationType) || prev.locationType,
+        roleLevel: (data.roleLevel as RoleLevel) || prev.roleLevel,
+        salaryMin: data.salaryMin ? String(data.salaryMin) : prev.salaryMin,
+        salaryMax: data.salaryMax ? String(data.salaryMax) : prev.salaryMax,
+        description: data.description || prev.description,
+        requirements: data.requirements || prev.requirements,
+        externalApplyUrl: data.externalApplyUrl || url || prev.externalApplyUrl,
+      }));
+      setAutofillDone(true);
+      setSalaryError("");
+    } catch {
+      setAutofillNote(
+        "Oy, sorry, we tried. Something about your link makes it so we can't auto-populate this one. Go ahead and fill it in below."
+      );
+    } finally {
+      setAutofilling(false);
+    }
+  }
 
   // Returning from Stripe Checkout: confirm payment, then show the confirmation.
   useEffect(() => {
@@ -232,6 +288,41 @@ export default function PostJobPage() {
           <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold uppercase font-display leading-[0.9] tracking-tight mb-8">
             Post a Job
           </h1>
+
+          {/* Auto-fill from an existing posting */}
+          <div className="border border-accent/40 bg-accent/[0.04] p-5 mb-8 max-w-3xl">
+            <label className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">
+              Save time: auto-fill from a link
+            </label>
+            <p className="text-xs text-muted mb-3 font-secondary">
+              Already have this job posted somewhere? Paste the link and we&apos;ll fill in what we can. Review it before you post.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="url"
+                value={autofillUrl}
+                onChange={(e) => { setAutofillUrl(e.target.value); setAutofillNote(""); setAutofillDone(false); }}
+                placeholder="https://yourcompany.com/careers/..."
+                className="w-full"
+              />
+              <button
+                type="button"
+                onClick={handleAutofill}
+                disabled={autofilling}
+                className="shrink-0 bg-accent text-black text-sm font-bold uppercase tracking-wider font-headline px-6 py-3 hover:bg-accent/90 transition-colors disabled:opacity-50"
+              >
+                {autofilling ? "Reading…" : "Auto-fill"}
+              </button>
+            </div>
+            {autofillNote && (
+              <p className="text-xs mt-3 font-secondary text-red-400">{autofillNote}</p>
+            )}
+            {autofillDone && !autofillNote && (
+              <p className="text-xs mt-3 font-secondary text-green-400">
+                Done. We filled in what we could, please review everything below before posting.
+              </p>
+            )}
+          </div>
 
           <div className="space-y-8 max-w-3xl">
             <section>
