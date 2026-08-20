@@ -15,24 +15,51 @@ import { applyFlag } from "@/lib/apply-flag";
 // new post — so Chris's one Shortcut does both: leave the note blank to post,
 // type a note to correct a job already on the board. See applyFlag / flag-note.ts.
 //
-// Auth is a single long random token (SHARE_TOKEN) stored inside the Shortcut.
-// It is deliberately separate from ADMIN_PASSWORD: this token only ever reaches
-// this one endpoint, so if a phone is lost it can be rotated on its own without
-// changing the admin password.
+// Auth is a long random token stored inside the Shortcut. It is deliberately
+// separate from ADMIN_PASSWORD: these tokens only ever reach this one endpoint,
+// so if a phone is lost the token can be rotated on its own without changing the
+// admin password.
+//
+// Each person who has the Shortcut gets their OWN token, so any one phone can be
+// cut off without disturbing the others. SHARE_TOKEN holds the first (original)
+// token; SHARE_TOKENS is an optional comma-separated list of additional tokens,
+// one per extra person. Keeping them in separate env vars means a new person can
+// be added by editing SHARE_TOKENS alone, never touching the original token.
+
+function validTokens(): string[] {
+  const tokens: string[] = [];
+  const primary = (process.env.SHARE_TOKEN || "").trim();
+  if (primary) tokens.push(primary);
+  for (const t of (process.env.SHARE_TOKENS || "").split(",")) {
+    const trimmed = t.trim();
+    if (trimmed) tokens.push(trimmed);
+  }
+  return tokens;
+}
 
 // Compare without leaking length/prefix information through timing.
-function tokenMatches(providedRaw: string): boolean {
-  // Both sides are trimmed. It's easy to store a secret with a trailing newline
-  // (piping it in with `echo` is enough to do it), and the resulting failure
-  // looks exactly like a wrong token with nothing in the logs to say otherwise.
-  const expected = (process.env.SHARE_TOKEN || "").trim();
-  const provided = (providedRaw || "").trim();
-  if (!expected || !provided || provided.length !== expected.length) return false;
+function equalsConstantTime(expected: string, provided: string): boolean {
+  if (expected.length !== provided.length) return false;
   let diff = 0;
   for (let i = 0; i < expected.length; i++) {
     diff |= expected.charCodeAt(i) ^ provided.charCodeAt(i);
   }
   return diff === 0;
+}
+
+function tokenMatches(providedRaw: string): boolean {
+  // Both sides are trimmed. It's easy to store a secret with a trailing newline
+  // (piping it in with `echo` is enough to do it), and the resulting failure
+  // looks exactly like a wrong token with nothing in the logs to say otherwise.
+  const provided = (providedRaw || "").trim();
+  if (!provided) return false;
+  // Check against every valid token; matched stays true if any one matches, but
+  // we always walk the whole list so timing doesn't reveal which token hit.
+  let matched = false;
+  for (const expected of validTokens()) {
+    if (equalsConstantTime(expected, provided)) matched = true;
+  }
+  return matched;
 }
 
 // The share sheet sometimes hands over a URL on its own and sometimes a blob of
