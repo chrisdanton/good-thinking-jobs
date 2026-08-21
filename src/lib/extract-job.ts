@@ -72,9 +72,15 @@ export function readableUrlFor(url: string): string {
   if (wd) {
     const host = wd[1];
     const tenant = host.split(".")[0];
-    const segs = wd[2].split(/[?#]/)[0].split("/").filter(Boolean);
+    let segs = wd[2].split(/[?#]/)[0].split("/").filter(Boolean);
     const jobIdx = segs.indexOf("job");
     if (jobIdx > 0) {
+      // A URL copied from the "Apply" button ends in "/apply" (or an apply
+      // sub-step like "/apply/autofillWithResume"). That is a login-gated deep
+      // link, not the posting, and the CXS endpoint 406s on it — so drop
+      // everything from the "apply" segment onward before building the path.
+      const applyIdx = segs.indexOf("apply", jobIdx);
+      if (applyIdx > -1) segs = segs.slice(0, applyIdx);
       const site = segs[jobIdx - 1];
       const rest = segs.slice(jobIdx).join("/");
       return `https://${host}/wday/cxs/${tenant}/${site}/${rest}`;
@@ -90,6 +96,21 @@ export function readableUrlFor(url: string): string {
   return id
     ? `https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/${id}`
     : url;
+}
+
+// The link people should actually apply at. For Workday, a URL copied from the
+// "Apply" button ends in "/apply" (or an apply sub-step) — a login-gated deep
+// link that dead-ends for anyone not already signed in. Trim it back to the
+// posting itself, which has a working Apply button. Non-Workday URLs pass through.
+export function canonicalApplyUrl(url: string): string {
+  const wd = url.match(/^(https?:\/\/[a-z0-9-]+\.wd\d+\.myworkdayjobs\.com\/.+)/i);
+  if (!wd) return url;
+  const [path, query] = url.split(/(?=[?#])/, 2) as [string, string?];
+  const segs = path.split("/");
+  const jobIdx = segs.indexOf("job");
+  const applyIdx = jobIdx > -1 ? segs.indexOf("apply", jobIdx) : -1;
+  if (applyIdx === -1) return url;
+  return segs.slice(0, applyIdx).join("/") + (query ?? "");
 }
 
 // A lot of company career pages (a16z's portfolio jobs among them) are just a
@@ -505,8 +526,10 @@ ${jsonLd ? `Structured job data found on the page (most reliable):\n${jsonLd}\n\
   }
 
   const fields = JSON.parse(textBlock.text) as ExtractedJob;
-  // Default the apply link to the original posting.
-  fields.externalApplyUrl = url;
+  // Default the apply link to the original posting. For Workday, strip any
+  // trailing "/apply" deep link so applicants land on the posting (with a
+  // working Apply button) rather than a login-gated dead end.
+  fields.externalApplyUrl = canonicalApplyUrl(url);
   // Strip Workday-style entity codes the model may have copied verbatim.
   fields.companyName = cleanCompanyName(fields.companyName);
   return fields;
