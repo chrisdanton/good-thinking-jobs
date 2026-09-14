@@ -15,7 +15,7 @@ const mono: React.CSSProperties = {
 };
 
 const stats = [
-  { label: "Subscribers", value: "17,000+" },
+  { label: "Subscribers", value: "18,000+" },
   { label: "Open Rate", value: "Top 10%" },
   { label: "Download Rate", value: "Top 10%" },
   { label: "Monthly Views", value: "85k+" },
@@ -167,7 +167,7 @@ export default function V4() {
               lineHeight: 1.55,
               marginBottom: 28,
             }}>
-              The weekly briefing on brand, culture, and marketing. Read by 17,000+ C-suite executives, founders, and creative leaders worldwide.
+              The weekly briefing on brand, culture, and marketing. Read by 18,000+ C-suite executives, founders, and creative leaders worldwide.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <a
@@ -529,7 +529,7 @@ export default function V4() {
             Looking for<br />your next<br />role?
           </h2>
           <p style={{ ...mono, fontSize: 12, color: "rgba(255,255,255,0.4)", maxWidth: 380, lineHeight: 1.8, marginBottom: 36 }}>
-            Brand, marketing, and creative leadership roles — delivered to 17,000+ inboxes every Sunday.
+            Brand, marketing, and creative leadership roles — delivered to 18,000+ inboxes every Sunday.
           </p>
           <Link href="/jobs" style={{
             ...mono,

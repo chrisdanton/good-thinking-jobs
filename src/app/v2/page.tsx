@@ -51,7 +51,7 @@ export default function V2() {
 
               {/* Stats — stacked display */}
               <div style={{ display: "flex", gap: 40 }}>
-                {[["17K+", "Subscribers"], ["Top 10%", "Open Rate"], ["85K+", "Monthly Views"]].map(([n, l]) => (
+                {[["18K+", "Subscribers"], ["Top 10%", "Open Rate"], ["85K+", "Monthly Views"]].map(([n, l]) => (
                   <div key={l} style={{ textAlign: "right" }}>
                     <div className="font-display font-bold" style={{ fontSize: "clamp(28px, 4vw, 48px)", color: YELLOW, lineHeight: 1 }}>{n}</div>
                     <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", letterSpacing: "0.15em", textTransform: "uppercase", marginTop: 6, fontFamily: "monospace" }}>{l}</div>

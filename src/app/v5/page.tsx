@@ -75,7 +75,7 @@ export default function V5() {
         {/* Left — dark type block */}
         <div style={{ backgroundColor: INK, padding: "64px 56px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {[{ v: "17,000+", l: "Subscribers" }, { v: "Top 10%", l: "Open Rate" }, { v: "Top 10%", l: "Downloads" }, { v: "85k+", l: "Monthly Views" }].map(s => (
+            {[{ v: "18,000+", l: "Subscribers" }, { v: "Top 10%", l: "Open Rate" }, { v: "Top 10%", l: "Downloads" }, { v: "85k+", l: "Monthly Views" }].map(s => (
               <span key={s.l} style={{ ...gt, fontSize: 10, fontWeight: 700, backgroundColor: YELLOW, color: INK, padding: "5px 12px" }}>
                 {s.v} {s.l}
               </span>
@@ -87,7 +87,7 @@ export default function V5() {
               Good<br />Think<br />ing
             </h1>
             <p style={{ ...gt, fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, maxWidth: 360, marginBottom: 32 }}>
-              Newsletter + Podcast — The weekly briefing on brand, culture, and marketing. Read by 17,000+ C-suite executives, founders, and creative leaders worldwide.
+              Newsletter + Podcast — The weekly briefing on brand, culture, and marketing. Read by 18,000+ C-suite executives, founders, and creative leaders worldwide.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <a href="https://ingoodco.substack.com/" target="_blank" rel="noopener noreferrer"
@@ -271,7 +271,7 @@ export default function V5() {
           </h2>
           <div style={{ maxWidth: 360 }}>
             <p style={{ fontSize: 14, color: "rgba(0,0,0,0.6)", lineHeight: 1.75, marginBottom: 28 }}>
-              Brand, marketing, and creative leadership roles — delivered to 17,000+ inboxes every Sunday.
+              Brand, marketing, and creative leadership roles — delivered to 18,000+ inboxes every Sunday.
             </p>
             <Link href="/jobs" style={{ ...gt, fontSize: 11, fontWeight: 700, backgroundColor: INK, color: YELLOW, padding: "13px 28px", textDecoration: "none", display: "inline-block" }}>
               Browse Jobs

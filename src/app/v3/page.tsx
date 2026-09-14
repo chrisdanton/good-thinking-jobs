@@ -34,7 +34,7 @@ export default function V3() {
                 Good<br />Thinking
               </h1>
               <p style={{ fontSize: 20, color: WARM_MUTED, lineHeight: 1.65, maxWidth: 400, marginBottom: 48, fontWeight: 300 }}>
-                The weekly briefing on brand, culture, and marketing — read by 17,000+ executives, founders, and creative leaders worldwide.
+                The weekly briefing on brand, culture, and marketing — read by 18,000+ executives, founders, and creative leaders worldwide.
               </p>
               <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                 <a href="https://ingoodco.substack.com/" target="_blank" rel="noopener noreferrer"
@@ -61,7 +61,7 @@ export default function V3() {
         <section style={{ borderBottom: `1px solid ${WARM_BORDER}`, backgroundColor: INK }}>
           <div style={{ maxWidth: 1280, margin: "0 auto", padding: "28px 40px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
-              {[["17,000+", "Subscribers"], ["Top 10%", "Open Rate"], ["Top 10%", "Download Rate"], ["85K+", "Monthly Views"]].map(([stat, label]) => (
+              {[["18,000+", "Subscribers"], ["Top 10%", "Open Rate"], ["Top 10%", "Download Rate"], ["85K+", "Monthly Views"]].map(([stat, label]) => (
                 <div key={label}>
                   <div className="font-display font-bold uppercase" style={{ fontSize: "clamp(24px, 3vw, 40px)", color: YELLOW, lineHeight: 1 }}>{stat}</div>
                   <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 8, fontFamily: "monospace" }}>{label}</div>
@@ -204,7 +204,7 @@ export default function V3() {
                 Looking for<br />your next role?
               </h2>
               <p style={{ fontSize: 18, color: WARM_MUTED, maxWidth: 440, lineHeight: 1.65 }}>
-                Brand, marketing, and creative leadership roles — delivered to 17,000+ inboxes every Sunday.
+                Brand, marketing, and creative leadership roles — delivered to 18,000+ inboxes every Sunday.
               </p>
             </div>
             <Link href="/jobs" style={{ backgroundColor: INK, color: YELLOW, fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", padding: "18px 40px", textTransform: "uppercase", display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none", whiteSpace: "nowrap" }}>

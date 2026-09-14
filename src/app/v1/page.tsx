@@ -63,7 +63,7 @@ export default function V1() {
             <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 24 }}>
               <p style={{ ...mono, fontSize: 13, color: "#666", maxWidth: 420, lineHeight: 1.7 }}>
                 The weekly briefing on brand, culture, and marketing.<br />
-                Read by 17,000+ C-suite executives, founders, and creative leaders worldwide.
+                Read by 18,000+ C-suite executives, founders, and creative leaders worldwide.
               </p>
               <div style={{ display: "flex", gap: 12 }}>
                 <a href="https://ingoodco.substack.com/" target="_blank" rel="noopener noreferrer"
@@ -80,7 +80,7 @@ export default function V1() {
           {/* Stats ticker */}
           <div style={{ borderTop: `1px solid ${SOFT}`, backgroundColor: WHITE }}>
             <div style={{ maxWidth: 1280, margin: "0 auto", padding: "14px 40px", display: "flex", flexWrap: "wrap", gap: "8px 40px" }}>
-              {[["SUBSCRIBERS", "17,000+"], ["OPEN_RATE", "TOP 10%"], ["DOWNLOAD_RATE", "TOP 10%"], ["MONTHLY_VIEWS", "85K+"]].map(([k, v]) => (
+              {[["SUBSCRIBERS", "18,000+"], ["OPEN_RATE", "TOP 10%"], ["DOWNLOAD_RATE", "TOP 10%"], ["MONTHLY_VIEWS", "85K+"]].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ ...mono, fontSize: 10, color: "#bbb", letterSpacing: "0.15em" }}>{k}</span>
                   <span style={{ ...mono, fontSize: 11, fontWeight: 700, backgroundColor: INK, color: YELLOW, padding: "2px 10px", borderRadius: 4 }}>{v}</span>
@@ -211,7 +211,7 @@ export default function V1() {
               Looking for<br />your next role?
             </h2>
             <p style={{ ...mono, fontSize: 13, color: "#666", maxWidth: 400, lineHeight: 1.65, marginBottom: 32 }}>
-              Brand, marketing, and creative leadership roles — delivered to 17,000+ inboxes every Sunday.
+              Brand, marketing, and creative leadership roles — delivered to 18,000+ inboxes every Sunday.
             </p>
             <Link href="/jobs" style={{ ...mono, backgroundColor: YELLOW, color: INK, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", padding: "15px 36px", borderRadius: 100, textTransform: "uppercase", display: "inline-flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
               Browse Jobs →

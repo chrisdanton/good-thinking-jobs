@@ -41,7 +41,7 @@ export const TIERS = {
     salaryLabel: "$200K+ / C-Suite",
     features: [
       "Listed on job board",
-      "Featured in newsletter (17K subscribers)",
+      "Featured in newsletter (18K subscribers)",
       "Pinned to top of the board",
       '"Featured" badge & highlight',
       "30-day listing",

@@ -60,7 +60,7 @@ export default function Home() {
             Good<br />Thinking
           </h1>
           <p className="text-xl sm:text-2xl text-white/70 max-w-2xl font-secondary leading-relaxed mb-10">
-            The weekly briefing on brand, culture, and marketing, read by 17,000+ C-suite executives, founders, and creative leaders worldwide.
+            The weekly briefing on brand, culture, and marketing, read by 18,000+ C-suite executives, founders, and creative leaders worldwide.
           </p>
           <div className="flex flex-wrap gap-4">
             <a
@@ -88,7 +88,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             {[
-              { stat: "17,000+", label: "Subscribers" },
+              { stat: "18,000+", label: "Subscribers" },
               { stat: "Top 10%", label: "Open Rate" },
               { stat: "Top 10%", label: "Download Rate" },
               { stat: "85k+", label: "Monthly Views" },
@@ -310,7 +310,7 @@ export default function Home() {
             <h3 className="text-3xl sm:text-4xl font-bold uppercase font-display text-white leading-tight mb-2">
               Looking for your next role?
             </h3>
-            <p className="text-white/60 font-secondary">Brand, marketing, and creative leadership roles, sent to 17,000+ inboxes every Sunday.</p>
+            <p className="text-white/60 font-secondary">Brand, marketing, and creative leadership roles, sent to 18,000+ inboxes every Sunday.</p>
           </div>
           <Link
             href="/jobs"

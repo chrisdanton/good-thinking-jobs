@@ -51,7 +51,7 @@ export default function AboutPage() {
               {
                 step: "03",
                 title: "Reach the right people",
-                desc: "Your role appears immediately. Premium listings are featured in our Sunday newsletter to 17K subscribers.",
+                desc: "Your role appears immediately. Premium listings are featured in our Sunday newsletter to 18K subscribers.",
               },
             ].map((item) => (
               <div
