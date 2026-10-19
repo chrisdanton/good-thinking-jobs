@@ -60,14 +60,14 @@ export const VIDEOS = [
 export const SPEAKERS = [
   {
     name: "Kirsten Ludwig",
-    role: "Co-Founder, IN GOOD CO",
+    roles: ["Co-Founder of IN GOOD CO", "Co-Host of GOOD THINKING"],
     img: "/speaking/kirsten.jpg",
     linkedin: "https://www.linkedin.com/in/kirstenludwig/",
     bio: "Kirsten Ludwig is a brand builder, cultural curator, and Co-Founder of IN GOOD CO, a global brand consultancy built for challenger brands that refuse to play it safe. She is the co-host of the GOOD THINKING podcast, a speaker and a top voice in brand. Her expertise is disrupting the status quo.",
   },
   {
     name: "Chris Danton",
-    role: "Co-Founder, IN GOOD CO · Writer, GOOD THINKING",
+    roles: ["Co-Founder of IN GOOD CO", "Co-Host of GOOD THINKING"],
     img: "/speaking/chris.jpg",
     linkedin: "https://www.linkedin.com/in/chrisdanton/",
     bio: "Chris is an award-winning futurist, brand builder, author, speaker, and creative strategist. She is also the author and podcast co-host for GOOD THINKING, a publication read by top brand executives across the world. Her expertise is leading the future of brand.",

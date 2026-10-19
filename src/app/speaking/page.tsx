@@ -213,10 +213,14 @@ export default function SpeakingPage() {
             {SPEAKERS.map((s, i) => (
               // Name first, then a large photo, then the bio: one column per speaker.
               <div key={s.name}>
-                <h3 className="speaking-display text-3xl sm:text-5xl">{s.name}</h3>
-                <p className="mt-2 inline-block px-2 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest" style={{ background: C.yellow }}>
-                  {s.role}
-                </p>
+                <h3 className="speaking-display text-2xl sm:text-4xl">{s.name}</h3>
+                <div className="mt-3 flex flex-col items-start gap-1.5">
+                  {s.roles.map((r) => (
+                    <span key={r} className="px-2 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest" style={{ background: C.yellow }}>
+                      {r}
+                    </span>
+                  ))}
+                </div>
                 <PinnedPhoto
                   src={s.img}
                   alt={s.name}
