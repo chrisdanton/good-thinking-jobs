@@ -11,7 +11,8 @@ import {
   TESTIMONIALS,
   VIDEOS,
 } from "./data";
-import { Btn, Eyebrow, HARD_SHADOW, PinnedCard, PinnedPhoto, SpeakingFooter, SpeakingNav } from "./ui";
+import EnquiryForm from "./enquiry-form";
+import { Btn, Eyebrow, HARD_SHADOW, Pin, PinnedCard, PinnedPhoto, SpeakingFooter, SpeakingNav } from "./ui";
 
 export const metadata: Metadata = {
   title: "Keynote Speakers on Brand, Culture & the Future · Kirsten Ludwig & Chris Danton",
@@ -126,7 +127,7 @@ export default function SpeakingPage() {
               stage, helping brand and marketing teams see what&apos;s next and act on it.
             </p>
             <div className="mt-9 flex flex-wrap gap-4">
-              <Btn href={BOOKING_MAILTO}>Book us to speak</Btn>
+              <Btn href="#book">Book us to speak</Btn>
               <Btn href="/speaking/press-kit" variant="outline">View the press kit</Btn>
             </div>
             <p className="mt-10 text-[11px] font-bold uppercase tracking-[0.3em]">Seen &amp; heard on</p>
@@ -163,7 +164,14 @@ export default function SpeakingPage() {
                 <PinnedCard key={t.no} tilt={s.tilt} bg={s.bg} fg={s.fg} pin={s.pin}>
                   <p className="speaking-display text-3xl opacity-60">{t.no}</p>
                   <h3 className="speaking-display mt-2 text-3xl sm:text-4xl">{t.title}</h3>
-                  <p className="mt-3 text-[15px] leading-relaxed">{t.body}</p>
+                  <p className="mt-3 text-[15px] leading-relaxed">{t.short}</p>
+                  <details className="group mt-4">
+                    <summary className="cursor-pointer list-none text-xs font-bold uppercase tracking-wide underline decoration-2 underline-offset-4">
+                      <span className="group-open:hidden">More ↓</span>
+                      <span className="hidden group-open:inline">Less ↑</span>
+                    </summary>
+                    <p className="mt-3 text-[14px] leading-relaxed">{t.body}</p>
+                  </details>
                 </PinnedCard>
               );
             })}
@@ -174,8 +182,8 @@ export default function SpeakingPage() {
                   Tell us about the room and what you want people to walk out with. We&apos;ll build the talk around it.
                 </p>
               </div>
-              <a href={BOOKING_MAILTO} className="mt-6 text-sm font-bold uppercase tracking-wide underline decoration-2 underline-offset-4">
-                Start the conversation ↗
+              <a href="#book" className="mt-6 text-sm font-bold uppercase tracking-wide underline decoration-2 underline-offset-4">
+                Start the conversation ↓
               </a>
             </PinnedCard>
           </div>
@@ -303,6 +311,12 @@ export default function SpeakingPage() {
             <p className="speaking-display mt-8 text-2xl sm:text-3xl">
               <span className="px-1.5" style={{ background: C.yellow }}>We&apos;re creating that. On purpose.</span>
             </p>
+            <p className="mt-8 max-w-xl text-base sm:text-lg leading-relaxed">
+              Want one for your executive team? We&apos;ll host it.
+            </p>
+            <div className="mt-5">
+              <Btn href="#book">Host a dinner with us</Btn>
+            </div>
           </div>
           {DINNER_PHOTOS.length > 1 ? (
             // Two photos: pinned and overlapping, like notes on a board.
@@ -318,22 +332,29 @@ export default function SpeakingPage() {
         </div>
       </section>
 
-      {/* Booking CTA */}
-      <section style={{ background: C.yellow, color: C.black }}>
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 text-center">
-          <Eyebrow>Booking</Eyebrow>
-          <h2 className="speaking-display mt-5 text-5xl sm:text-8xl lg:text-[8.5rem]">
-            Bring <span className="speaking-outline-dark">GOOD<br />THINKING</span> to<br />your stage.
-          </h2>
-          <div className="mt-10">
-            <Btn href={BOOKING_MAILTO}>Book us to speak</Btn>
+      {/* Booking enquiry form: every "Book us" button lands here. */}
+      <section id="book" className="scroll-mt-16" style={{ background: C.yellow, color: C.black }}>
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[5fr_7fr] lg:gap-16">
+          <div>
+            <Eyebrow>Booking</Eyebrow>
+            <h2 className="speaking-display mt-4 text-6xl sm:text-7xl lg:text-8xl">
+              Bring <span className="speaking-outline-dark">GOOD THINKING</span> to your stage.
+            </h2>
+            <p className="mt-8 max-w-md text-lg leading-relaxed">
+              Booking a keynote or workshop? Want us to host a dinner for your
+              executive team? Writing a piece? Tell us what you&apos;re planning.
+            </p>
+            <p className="mt-6 text-sm">
+              Prefer email?{" "}
+              <a href={BOOKING_MAILTO} className="font-bold underline decoration-2 underline-offset-4">
+                {BOOKING_EMAIL}
+              </a>
+            </p>
           </div>
-          <p className="mt-6 text-sm">
-            or email{" "}
-            <a href={BOOKING_MAILTO} className="font-bold underline decoration-2 underline-offset-4">
-              {BOOKING_EMAIL}
-            </a>
-          </p>
+          <div className="relative border-2 border-black p-6 pt-10 sm:p-9 sm:pt-12" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
+            <Pin color={C.black} />
+            <EnquiryForm />
+          </div>
         </div>
       </section>
 

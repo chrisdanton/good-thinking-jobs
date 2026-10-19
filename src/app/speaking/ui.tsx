@@ -1,7 +1,7 @@
 // Shared visual pieces for the speaking page and press kit: the pinned,
 // slightly tilted "bulletin board" cards and photos, the local nav, and footer.
 import type { CSSProperties, ReactNode } from "react";
-import { BOOKING_MAILTO, C } from "./data";
+import { C } from "./data";
 
 export const HARD_SHADOW = "8px 8px 0 0 #000";
 export const HARD_SHADOW_SM = "5px 5px 0 0 #000";
@@ -148,7 +148,7 @@ export function SpeakingNav({ active }: { active?: "press" }) {
           ))}
         </nav>
         <a
-          href={BOOKING_MAILTO}
+          href="/speaking#book"
           className="justify-self-end border-2 border-black px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wide"
           style={{ background: C.yellow, color: C.black }}
         >
@@ -175,7 +175,7 @@ export function SpeakingFooter() {
           <a href="/futures" className="hover:opacity-70">Good Future</a>
           <a href="/speaking/press-kit" className="hover:opacity-70">Press Kit</a>
           <a href="https://ingoodco.substack.com" className="hover:opacity-70">Substack</a>
-          <a href={BOOKING_MAILTO} className="hover:opacity-70">Contact</a>
+          <a href="/speaking#book" className="hover:opacity-70">Contact</a>
         </nav>
         <span className="text-xs" style={{ color: "#777" }}>© {new Date().getFullYear()} IN GOOD CO</span>
       </div>

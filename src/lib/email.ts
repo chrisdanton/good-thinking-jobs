@@ -15,16 +15,21 @@ function getTransport() {
   });
 }
 
-async function sendMail(opts: { to: string; subject: string; html: string }) {
+async function sendMail(opts: { to: string; subject: string; html: string; replyTo?: string; fromName?: string }) {
   const user = process.env.GMAIL_USER;
   // Gmail rewrites the From to the authenticated account, so we use it directly
   // with a friendly display name.
   await getTransport().sendMail({
-    from: `"GOOD THINKING Jobs" <${user}>`,
+    from: `"${opts.fromName || "GOOD THINKING Jobs"}" <${user}>`,
     to: opts.to,
     subject: opts.subject,
     html: opts.html,
+    replyTo: opts.replyTo,
   });
+}
+
+function escapeHtml(s: string) {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
 
 const ADMIN_EMAIL = "goodjobs@weareingoodco.com";
@@ -598,6 +603,43 @@ export async function sendNewsletterDigest(
         <p style="font-size: 13px; color: #888; line-height: 1.65; margin: 0; border-top: 1px solid #eeeeee; padding-top: 24px;">
           Manage everything in the <a href="${BASE_URL}/admin" style="color: #111; border-bottom: 2px solid #F9FF00; text-decoration: none;">admin panel</a>.<br><br>GOOD THINKING · The weekly briefing on brand, culture, and marketing.
         </p>
+      </div>
+    `,
+  });
+}
+
+// Speaking page enquiry form → hello@. Reply goes straight to the sender.
+const SPEAKING_INBOX = "hello@weareingoodco.com";
+
+export async function sendSpeakingEnquiry(e: {
+  name: string;
+  email: string;
+  company: string;
+  topic: string;
+  when: string;
+  message: string;
+}) {
+  const row = (label: string, value: string) =>
+    value
+      ? `<tr><td style="padding: 8px 16px 8px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; vertical-align: top; white-space: nowrap;">${label}</td><td style="padding: 8px 0; font-size: 15px; color: #111;">${escapeHtml(value)}</td></tr>`
+      : "";
+
+  await sendMail({
+    to: SPEAKING_INBOX,
+    replyTo: e.email,
+    fromName: "GOOD THINKING Speaking",
+    subject: `${e.topic} enquiry: ${e.name}${e.company ? ` · ${e.company}` : ""}`,
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; color: #111; padding: 40px; border: 1px solid #eeeeee;">
+        <div style="display: inline-block; background: #F9FF00; padding: 6px 10px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">${escapeHtml(e.topic)} enquiry</div>
+        <table style="margin: 24px 0; border-collapse: collapse;">
+          ${row("Name", e.name)}
+          ${row("Email", e.email)}
+          ${row("Company", e.company)}
+          ${row("When / where", e.when)}
+        </table>
+        <p style="font-size: 15px; line-height: 1.7; white-space: pre-wrap; margin: 0 0 28px;">${escapeHtml(e.message)}</p>
+        <p style="font-size: 13px; color: #888; margin: 0; border-top: 1px solid #eeeeee; padding-top: 20px;">Hit reply to answer ${escapeHtml(e.name)} directly. Sent from getgoodthinking.com/speaking.</p>
       </div>
     `,
   });
