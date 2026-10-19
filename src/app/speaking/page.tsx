@@ -1,4 +1,17 @@
 import type { Metadata } from "next";
+import {
+  BOOKING_EMAIL,
+  BOOKING_MAILTO,
+  C,
+  FORMATS,
+  SITE_URL,
+  SPEAKERS,
+  STAGES,
+  TALKS,
+  TESTIMONIALS,
+  VIDEOS,
+} from "./data";
+import { Btn, Eyebrow, HARD_SHADOW, PinnedCard, PinnedPhoto, SpeakingFooter, SpeakingNav } from "./ui";
 
 export const metadata: Metadata = {
   title: "Keynote Speakers on Brand, Culture & the Future · Kirsten Ludwig & Chris Danton",
@@ -25,60 +38,18 @@ export const metadata: Metadata = {
   },
 };
 
-const BOOKING_EMAIL = "hello@weareingoodco.com";
-const BOOKING_MAILTO = `mailto:${BOOKING_EMAIL}?subject=Speaking%20inquiry%20for%20GOOD%20THINKING`;
 
-const TALKS = [
-  {
-    no: "01",
-    title: "The Year Ahead",
-    body: "A fast, provocative tour of what's coming across culture, brand, tech, and retail, drawn from the trends work behind GOOD FUTURE. Your team leaves with a shared map of the signals that matter, and the confidence to act on them.",
-  },
-  {
-    no: "02",
-    title: "Thinking in Possibilities",
-    body: "Most brands stay boxed in by their own category. This is about breaking out of the silo, thinking beyond the confines of where you're supposed to play, and taking hold of your brand's trajectory instead of letting the market decide it for you.",
-  },
-  {
-    no: "03",
-    title: "The Age of Authorship",
-    body: "AI just made building almost free, so execution is no longer the advantage. The hard part is mattering. Why vision, not output, is the real differentiator now, and what it means for brands when anyone can make anything.",
-  },
-  {
-    no: "04",
-    title: "The Public CMO",
-    body: "The most powerful brand asset a company has might be the person leading it. Why the next generation of CMOs and founders are becoming public figures, how to build a personal brand without the cringe, and what it unlocks for the brand behind you.",
-  },
-  {
-    no: "05",
-    title: "GOOD HARD TRUTHS",
-    body: "You're too close to your own brand to see it clearly. This is us pointing the GOOD THINKING lens at yours: the honest read on how you're really perceived, the stuff your team feels but can't quite say, and 3 to 5 real actions to run with. Tough love, built to leave the room energized rather than audited.",
-  },
+// Dinner photos. Add the menu shot as a second entry and the two will pin side by side.
+const DINNER_PHOTOS = [{ src: "/speaking/dinner-1.jpg", alt: "Kirsten Ludwig and Chris Danton at a GOOD THINKING CMO dinner" }];
+
+// Talk cards cycle through the brand colors and tilt a little, like notes pinned to a board.
+const CARD_STYLES = [
+  { bg: C.yellow, fg: C.black, pin: C.black, tilt: -1 },
+  { bg: C.white, fg: C.black, pin: C.yellow, tilt: 1 },
+  { bg: C.black, fg: C.white, pin: C.yellow, tilt: -0.75 },
+  { bg: C.white, fg: C.black, pin: C.black, tilt: 1.25 },
+  { bg: C.yellow, fg: C.black, pin: C.black, tilt: -1.25 },
 ];
-
-const STAGES = ["SXSW · Austin", "Brands & Culture · New York", "Private brand & leadership summits"];
-
-const VIDEOS = [
-  { title: "SXSW · Austin", id: "aWDxk7nBQ1s" },
-  { title: "Brands & Culture · New York", id: "lktsrBpM_0k" },
-];
-
-const SPEAKERS = [
-  {
-    name: "Kirsten Ludwig",
-    role: "Co-Founder, IN GOOD CO",
-    img: "/speaking/kirsten.jpg",
-    bio: "Kirsten Ludwig is a brand builder, cultural curator, and Co-Founder of IN GOOD CO, a global brand consultancy built for challenger brands that refuse to play it safe. She is the co-host of the GOOD THINKING podcast, a speaker and a top voice in brand. Her expertise is disrupting the status quo.",
-  },
-  {
-    name: "Chris Danton",
-    role: "Co-Founder, IN GOOD CO · Writer, GOOD THINKING",
-    img: "/speaking/chris.jpg",
-    bio: "Chris is an award-winning futurist, brand builder, author, speaker, and creative strategist. She is also the author and podcast co-host for GOOD THINKING, a publication read by top brand executives across the world. Her expertise is leading the future of brand.",
-  },
-];
-
-const SITE_URL = "https://getgoodthinking.com";
 
 // Structured data (schema.org) so search engines and AI/agentic search can
 // identify Kirsten & Chris as keynote speakers, their topics, and affiliation.
@@ -133,96 +104,85 @@ const JSON_LD = {
 
 export default function SpeakingPage() {
   return (
-    <div className="speaking-root min-h-screen overflow-x-hidden bg-black text-white font-sans selection:bg-accent">
+    <div className="speaking-root min-h-screen overflow-x-hidden font-sans" style={{ background: C.cream, color: C.black }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
       />
       {/* Global switcher bar is rendered site-wide via layout.tsx (GlobalBar). */}
+      <SpeakingNav />
 
       {/* Hero */}
-      <section className="px-5 sm:px-8 lg:px-12 pt-16 sm:pt-20 lg:pt-24 pb-16 lg:pb-24">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-          <div className="lg:col-span-7">
-            <p className="text-accent text-[10px] sm:text-sm uppercase tracking-[0.15em] sm:tracking-[0.25em] mb-6">
-              Keynotes · Live Podcasts · Workshops
-            </p>
-            <h1 className="speaking-display text-white text-[13.5vw] sm:text-[12.5vw] lg:text-[10.5rem]">
-              Good<br />Thinking,<br />
-              <span className="text-accent">Out Loud.</span>
+      <section style={{ background: C.yellow, color: C.black }}>
+        <div className="mx-auto grid max-w-6xl gap-14 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[7fr_5fr] lg:items-center lg:gap-16">
+          <div>
+            <Eyebrow>Keynotes · Workshops · CMO Dinners</Eyebrow>
+            <h1 className="speaking-display mt-5 text-[clamp(3.6rem,13vw,8.5rem)]">
+              Good Thinking,<br />
+              <span className="speaking-outline-dark">Out Loud.</span>
             </h1>
-            <p className="mt-8 max-w-xl text-lg sm:text-xl text-white/70 leading-relaxed">
+            <p className="mt-8 max-w-xl text-lg sm:text-xl leading-relaxed">
               Kirsten Ludwig &amp; Chris Danton take the ideas behind GOOD THINKING to the
               stage, helping brand and marketing teams see what&apos;s next and act on it.
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a
-                href={BOOKING_MAILTO}
-                className="bg-accent text-black font-bold uppercase tracking-wide text-sm px-8 py-4 hover:brightness-110 transition-all"
-              >
-                Book us to speak
-              </a>
-              <a
-                href="#talks"
-                className="text-white/60 hover:text-white text-sm uppercase tracking-widest transition-colors"
-              >
-                See the talks ↓
-              </a>
+            <div className="mt-9 flex flex-wrap gap-4">
+              <Btn href={BOOKING_MAILTO}>Book us to speak</Btn>
+              <Btn href="/speaking/press-kit" variant="outline">View the press kit</Btn>
             </div>
+            <p className="mt-10 text-[11px] font-bold uppercase tracking-[0.3em]">Seen &amp; heard on</p>
+            <ul className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-3">
+              {STAGES.map((s) => (
+                <li key={s} className="speaking-display text-xl sm:text-2xl">{s}</li>
+              ))}
+            </ul>
           </div>
-          <div className="lg:col-span-5">
-            <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/speaking/duo.jpg"
-                alt="Kirsten Ludwig and Chris Danton"
-                className="w-full h-[440px] sm:h-[520px] lg:h-[640px] object-cover grayscale-[0.15]"
-              />
-            </div>
-          </div>
+          <PinnedPhoto
+            src="/speaking/duo.jpg"
+            alt="Kirsten Ludwig and Chris Danton"
+            tilt={2}
+            pin={C.black}
+            className="mx-auto w-full max-w-sm lg:max-w-none"
+            imgClassName="aspect-[5/6] object-cover"
+          />
         </div>
-      </section>
-
-      {/* Positioning statement */}
-      <section className="px-5 sm:px-8 lg:px-12 py-20 lg:py-28 border-t border-white/10">
-        <p className="speaking-display text-white text-3xl sm:text-6xl lg:text-7xl max-w-5xl leading-[0.95]">
-          Culture moves fast. We help your team{" "}
-          <span className="text-accent">move first</span>, with talks that are equal parts
-          foresight, provocation, and practical playbook.
-        </p>
       </section>
 
       {/* Talks */}
-      <section id="talks" className="px-5 sm:px-8 lg:px-12 py-16 lg:py-20 border-t border-white/10">
-        <div className="flex items-baseline justify-between mb-12">
-          <h2 className="speaking-display text-accent text-5xl sm:text-7xl">The Talks</h2>
-          <span className="text-white/40 text-xs uppercase tracking-widest hidden sm:block">
-            Keynote · Fireside · Workshop
-          </span>
-        </div>
-        <div className="border-t border-white/15">
-          {TALKS.map((t) => (
-            <div
-              key={t.no}
-              className="grid md:grid-cols-12 gap-4 md:gap-8 py-9 border-b border-white/15 group"
-            >
-              <div className="md:col-span-1 text-accent font-display text-3xl">{t.no}</div>
-              <h3 className="md:col-span-4 speaking-display text-white text-3xl sm:text-4xl">
-                {t.title}
-              </h3>
-              <p className="md:col-span-7 text-white/70 text-base sm:text-lg leading-relaxed max-w-2xl">
-                {t.body}
-              </p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-8 text-white/50 text-sm max-w-2xl">
-          Every talk is tailored to your audience and shaped with you ahead of the date. Formats
-          range from a 20-minute provocation to a half-day working session.
-        </p>
-        <div className="mt-10">
-          <p className="text-white/40 text-[11px] uppercase tracking-[0.2em] mb-4">Topics we speak on</p>
-          <div className="flex flex-wrap gap-2">
+      <section id="talks" style={{ background: C.cream }}>
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 md:py-28">
+          <Eyebrow>The Talks</Eyebrow>
+          <h2 className="speaking-display mt-3 text-5xl md:text-7xl">Book us for your stage</h2>
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed">
+            Every talk is tailored to your audience and shaped with you ahead of the date. Formats
+            range from a 20-minute provocation to a half-day working session.
+          </p>
+          <div className="mt-14 grid gap-x-7 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {TALKS.map((t, i) => {
+              const s = CARD_STYLES[i % CARD_STYLES.length];
+              return (
+                <PinnedCard key={t.no} tilt={s.tilt} bg={s.bg} fg={s.fg} pin={s.pin}>
+                  <p className="speaking-display text-3xl opacity-60">{t.no}</p>
+                  <h3 className="speaking-display mt-2 text-3xl sm:text-4xl">{t.title}</h3>
+                  <p className="mt-3 text-[15px] leading-relaxed">{t.body}</p>
+                </PinnedCard>
+              );
+            })}
+            <PinnedCard tilt={0.75} bg={C.paper} pin={C.yellow} className="flex flex-col justify-between">
+              <div>
+                <h3 className="speaking-display text-3xl sm:text-4xl">Something else in mind?</h3>
+                <p className="mt-3 text-[15px] leading-relaxed">
+                  Tell us about the room and what you want people to walk out with. We&apos;ll build the talk around it.
+                </p>
+              </div>
+              <a href={BOOKING_MAILTO} className="mt-6 text-sm font-bold uppercase tracking-wide underline decoration-2 underline-offset-4">
+                Start the conversation ↗
+              </a>
+            </PinnedCard>
+          </div>
+          <p className="mt-14 text-[15px]">
+            <span className="font-bold">Formats:</span> {FORMATS.join(" · ")}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2">
             {[
               "Brand",
               "Marketing",
@@ -233,10 +193,7 @@ export default function SpeakingPage() {
               "Personal Brand",
               "The Future of Brand",
             ].map((t) => (
-              <span
-                key={t}
-                className="border border-white/20 text-white/70 text-xs uppercase tracking-wide px-3 py-1.5"
-              >
+              <span key={t} className="border-2 border-black text-xs font-semibold uppercase tracking-wide px-3 py-1.5">
                 {t}
               </span>
             ))}
@@ -245,143 +202,153 @@ export default function SpeakingPage() {
       </section>
 
       {/* Speakers */}
-      <section id="speakers" className="px-5 sm:px-8 lg:px-12 py-16 lg:py-20 border-t border-white/10">
-        <h2 className="speaking-display text-accent text-5xl sm:text-7xl mb-12">The Speakers</h2>
-        <div className="grid sm:grid-cols-2 gap-10 lg:gap-16">
-          {SPEAKERS.map((s) => (
-            <div key={s.name}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={s.img}
-                alt={s.name}
-                className="w-full h-[440px] sm:h-[500px] object-cover object-top grayscale mb-6"
-              />
-              <h3 className="speaking-display text-white text-4xl sm:text-5xl">{s.name}</h3>
-              <p className="text-accent text-xs uppercase tracking-widest mt-2 mb-4">{s.role}</p>
-              <p className="text-white/70 text-base sm:text-lg leading-relaxed max-w-md">{s.bio}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-10 text-white/60 text-base sm:text-lg leading-relaxed max-w-3xl">
-          Together they lead <span className="text-white">IN GOOD CO</span> and publish{" "}
-          <span className="text-white">GOOD THINKING</span>, a weekly newsletter and podcast on
-          brand, marketing, and culture. They speak as a duo or solo, depending on the room.
-        </p>
-      </section>
-
-      {/* Stages / proof */}
-      <section id="stages" className="border-t border-white/10">
-        <div className="px-5 sm:px-8 lg:px-12 pt-16 lg:pt-20 pb-10">
-          <h2 className="speaking-display text-accent text-5xl sm:text-7xl mb-10">On Stage</h2>
-          <div className="flex flex-wrap gap-x-10 gap-y-4">
-            {STAGES.map((v) => (
-              <span key={v} className="text-white text-lg sm:text-2xl font-display uppercase tracking-wide">
-                {v}
-              </span>
+      <section id="speakers" style={{ background: C.white }}>
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 md:py-28">
+          <Eyebrow>The Speakers</Eyebrow>
+          <h2 className="speaking-display mt-3 text-5xl md:text-7xl">Meet Kirsten &amp; Chris</h2>
+          <div className="mt-14 grid gap-14 sm:grid-cols-2 lg:gap-20">
+            {SPEAKERS.map((s, i) => (
+              <div key={s.name}>
+                <PinnedPhoto
+                  src={s.img}
+                  alt={s.name}
+                  tilt={i === 0 ? -2 : 2}
+                  pin={i === 0 ? C.yellow : C.black}
+                  imgClassName="aspect-[4/5] object-cover object-top grayscale"
+                />
+                <h3 className="speaking-display mt-10 text-4xl sm:text-5xl">{s.name}</h3>
+                <p className="mt-2 inline-block px-2 py-0.5 text-xs font-bold uppercase tracking-widest" style={{ background: C.yellow }}>
+                  {s.role}
+                </p>
+                <p className="mt-4 max-w-md text-base sm:text-lg leading-relaxed">{s.bio}</p>
+              </div>
             ))}
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/speaking/onstage-duo.jpg"
-          alt="Kirsten Ludwig and Chris Danton"
-          className="w-full h-[440px] lg:h-[620px] object-cover object-[center_28%]"
-        />
-        <div className="px-5 sm:px-8 lg:px-12 py-16 lg:py-20 grid md:grid-cols-2 gap-8 lg:gap-12">
-          {VIDEOS.map((v) => (
-            <div key={v.id}>
-              <div className="relative w-full aspect-video border border-white/15">
-                <iframe
-                  className="absolute inset-0 w-full h-full"
-                  src={`https://www.youtube.com/embed/${v.id}`}
-                  title={v.title}
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+      </section>
+
+      {/* On stage */}
+      <section id="stages" style={{ background: C.black, color: C.white }}>
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 md:py-28">
+          <Eyebrow color={C.yellow}>On Stage</Eyebrow>
+          <h2 className="speaking-display mt-3 text-5xl md:text-7xl">See us in the room</h2>
+          <div className="mt-12 border-2" style={{ borderColor: C.yellow, boxShadow: `8px 8px 0 0 ${C.yellow}` }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/speaking/paradigms-culture.jpg"
+              alt="Kirsten Ludwig and Chris Danton on stage at Paradigms"
+              className="w-full h-[320px] sm:h-[460px] lg:h-[560px] object-cover object-[center_80%]"
+            />
+          </div>
+          <p className="mt-5 text-xs font-bold uppercase tracking-widest" style={{ color: C.yellow }}>Paradigms</p>
+          <div className="mt-14 grid gap-10 md:grid-cols-2 lg:gap-12">
+            {VIDEOS.map((v) => (
+              <div key={v.id}>
+                <div className="relative w-full aspect-video border-2" style={{ borderColor: "#333" }}>
+                  <iframe
+                    className="absolute inset-0 w-full h-full"
+                    src={`https://www.youtube.com/embed/${v.id}`}
+                    title={v.title}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+                <p className="mt-3 text-xs font-bold uppercase tracking-widest" style={{ color: C.yellow }}>{v.title}</p>
               </div>
-              <p className="text-accent text-xs uppercase tracking-widest mt-3">{v.title}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
+      {/* What people say (hidden until real quotes are added in data.ts) */}
+      {TESTIMONIALS.length > 0 && (
+        <section style={{ background: C.yellow, color: C.black }}>
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 md:py-28">
+            <Eyebrow>Kind Words</Eyebrow>
+            <h2 className="speaking-display mt-3 text-5xl md:text-7xl">What people say</h2>
+            <div className="mt-12 grid gap-8 md:grid-cols-2">
+              {TESTIMONIALS.map((t) => (
+                <blockquote key={t.quote} className="border-2 border-black p-7 sm:p-9" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
+                  <p className="text-lg leading-relaxed">“{t.quote}”</p>
+                  <footer className="mt-5 text-xs font-bold uppercase tracking-[0.15em]">{t.who}</footer>
+                </blockquote>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* CMO Dinners */}
-      <section id="dinners" className="px-5 sm:px-8 lg:px-12 py-16 lg:py-24 border-t border-white/10">
-        <p className="text-accent text-xs uppercase tracking-[0.25em] mb-6">Convenings</p>
-        <h2 className="speaking-display text-accent text-5xl sm:text-7xl mb-8">CMO Dinners</h2>
-        <p className="speaking-display text-white text-2xl sm:text-4xl max-w-4xl leading-[1.05] mb-12">
-          A closed-door dinner for CMOs. Invite-only, curated by GOOD THINKING. People who
-          already trust us enough to cancel other plans.
-        </p>
-        <div className="grid sm:grid-cols-3 gap-4 mb-14">
-          {["dinner-1", "dinner-2", "dinner-3"].map((d) => (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              key={d}
-              src={`/speaking/${d}.jpg`}
-              alt="A GOOD THINKING CMO dinner"
-              className="w-full h-[260px] sm:h-[320px] object-cover"
-            />
-          ))}
-        </div>
-        <div className="grid md:grid-cols-2 gap-x-12 gap-y-6 max-w-5xl text-white/70 text-base sm:text-lg leading-relaxed">
-          <p>
-            Closed door. No phones. No devices of any kind. Because the best conversations are
-            never recorded.
-          </p>
-          <p>
-            Here&apos;s the thing about Cannes: the panels are packed. The activations are
-            impressive. The rosé is plentiful. And yet, the most valuable thing that happens
-            there has nothing to do with any of it.
-          </p>
-          <p>
-            It&apos;s the conversation at 8pm when the agenda falls away. When someone says the
-            thing you&apos;ve been thinking all week but couldn&apos;t say on stage.
-          </p>
-          <p className="speaking-display text-accent text-2xl sm:text-3xl self-end">
-            We&apos;re creating that. On purpose.
-          </p>
+      <section id="dinners" style={{ background: C.paper, color: C.black }}>
+        <div className="mx-auto grid max-w-6xl gap-14 px-4 py-14 sm:px-6 sm:py-20 md:py-28 lg:grid-cols-2 lg:items-center lg:gap-16">
+          <div>
+            <Eyebrow>Convenings</Eyebrow>
+            <h2 className="speaking-display mt-3 text-5xl md:text-7xl">CMO Dinners</h2>
+            <p className="speaking-display mt-6 text-3xl sm:text-4xl">Closed-door dinners for CMOs.</p>
+            <div className="mt-8 max-w-xl space-y-5 text-base sm:text-lg leading-relaxed">
+              <p>
+                Invite-only, curated by GOOD THINKING. People who already trust us enough to cancel
+                other plans.
+              </p>
+              <p>
+                Closed door. No phones. No devices of any kind. Because the best conversations are
+                never recorded.
+              </p>
+              <p>
+                It&apos;s the conversation at 8pm when the agenda falls away. When someone says the
+                thing you&apos;ve been thinking all week but couldn&apos;t say on stage.
+              </p>
+            </div>
+            <p className="speaking-display mt-8 text-2xl sm:text-3xl">
+              <span className="px-1.5" style={{ background: C.yellow }}>We&apos;re creating that. On purpose.</span>
+            </p>
+          </div>
+          {DINNER_PHOTOS.length > 1 ? (
+            // Two photos: pinned and overlapping, like notes on a board.
+            <div className="relative mx-auto w-full max-w-sm lg:max-w-none pb-24">
+              <PinnedPhoto src={DINNER_PHOTOS[0].src} alt={DINNER_PHOTOS[0].alt} tilt={-2} pin={C.yellow} className="w-[78%]" imgClassName="aspect-[4/3] object-cover" />
+              <div className="absolute bottom-0 right-0 w-[55%]">
+                <PinnedPhoto src={DINNER_PHOTOS[1].src} alt={DINNER_PHOTOS[1].alt} tilt={3} pin={C.black} imgClassName="aspect-[3/4] object-cover" />
+              </div>
+            </div>
+          ) : (
+            <PinnedPhoto src={DINNER_PHOTOS[0].src} alt={DINNER_PHOTOS[0].alt} tilt={-1.5} pin={C.yellow} imgClassName="aspect-[4/3] object-cover" />
+          )}
         </div>
       </section>
 
       {/* Booking CTA */}
-      <section className="px-5 sm:px-8 lg:px-12 py-24 lg:py-32 border-t border-white/10 text-center">
-        <p className="text-accent text-xs uppercase tracking-[0.25em] mb-6">Booking</p>
-        <h2 className="speaking-display text-white text-5xl sm:text-8xl lg:text-[9rem] mb-10">
-          Bring <span className="speaking-outline">GOOD<br />THINKING</span> to<br />your stage.
-        </h2>
-        <a
-          href={BOOKING_MAILTO}
-          className="inline-block bg-accent text-black font-bold uppercase tracking-wide text-sm px-10 py-5 hover:brightness-110 transition-all"
-        >
-          Book us to speak
-        </a>
-        <p className="mt-6 text-white/50 text-sm">
-          or email{" "}
-          <a href={BOOKING_MAILTO} className="text-accent underline underline-offset-4">
-            {BOOKING_EMAIL}
-          </a>
-        </p>
+      <section style={{ background: C.yellow, color: C.black }}>
+        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28 text-center">
+          <Eyebrow>Booking</Eyebrow>
+          <h2 className="speaking-display mt-5 text-5xl sm:text-8xl lg:text-[8.5rem]">
+            Bring <span className="speaking-outline-dark">GOOD<br />THINKING</span> to<br />your stage.
+          </h2>
+          <div className="mt-10">
+            <Btn href={BOOKING_MAILTO}>Book us to speak</Btn>
+          </div>
+          <p className="mt-6 text-sm">
+            or email{" "}
+            <a href={BOOKING_MAILTO} className="font-bold underline decoration-2 underline-offset-4">
+              {BOOKING_EMAIL}
+            </a>
+          </p>
+        </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-5 sm:px-8 lg:px-12 py-12 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="GOOD THINKING" className="h-6 w-auto" />
-          <span className="text-white/40 text-xs uppercase tracking-widest">by</span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/speaking/igc-logo.svg" alt="IN GOOD CO" className="h-4 w-auto" />
+      {/* Press kit teaser */}
+      <section style={{ background: C.cream, color: C.black }} className="border-t-2 border-black">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <h2 className="speaking-display text-4xl sm:text-5xl">Writing about us?</h2>
+            <p className="mt-2 text-base">Bios, approved photos, logos, and contact details, all in one place.</p>
+          </div>
+          <Btn href="/speaking/press-kit" variant="outline">View the press kit</Btn>
         </div>
-        <nav className="flex flex-wrap gap-x-8 gap-y-2 text-xs uppercase tracking-widest text-white/60">
-          <a href="/jobs" className="hover:text-white transition-colors">Jobs</a>
-          <a href="/futures" className="hover:text-white transition-colors">Good Future</a>
-          <a href="https://ingoodco.substack.com" className="hover:text-white transition-colors">Newsletter</a>
-          <a href={BOOKING_MAILTO} className="hover:text-white transition-colors">Contact</a>
-        </nav>
-        <span className="text-white/30 text-xs">© {new Date().getFullYear()} IN GOOD CO</span>
-      </footer>
+      </section>
+
+      <SpeakingFooter />
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function GlobalBar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="sticky top-0 z-50 w-full bg-black border-b border-white/10 text-white">
+    <div className="print:hidden sticky top-0 z-50 w-full bg-black border-b border-white/10 text-white">
       <div className="grid grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-8 lg:px-12 py-3">
         {/* Desktop section switcher */}
         <nav className="hidden sm:flex justify-self-start items-center gap-6 text-[11px] uppercase tracking-[0.14em]">
