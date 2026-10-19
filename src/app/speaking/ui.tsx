@@ -179,7 +179,8 @@ export function SpeakingNav({ active }: { active?: "press" }) {
 export function SpeakingFooter() {
   return (
     <footer className="speaking-noprint" style={{ background: C.black, color: C.white }}>
-      <div className="mx-auto max-w-6xl px-6 py-12 sm:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      {/* Phones: centered stack (logos, two-column links, copyright). Larger screens: one row. */}
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 px-6 py-12 text-center sm:flex-row sm:justify-between sm:px-10 sm:text-left">
         <div className="flex items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="GOOD THINKING" className="h-6 w-auto" />
@@ -187,12 +188,12 @@ export function SpeakingFooter() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/speaking/igc-logo.svg" alt="IN GOOD CO" className="h-4 w-auto" />
         </div>
-        <nav className="flex flex-wrap gap-x-8 gap-y-2 text-xs uppercase tracking-widest" style={{ color: "#aaa" }}>
+        <nav className="grid grid-cols-2 gap-x-12 gap-y-4 text-xs uppercase tracking-widest sm:flex sm:gap-x-8" style={{ color: "#aaa" }}>
           <a href="/jobs" className="hover:opacity-70">Jobs</a>
           <a href="/futures" className="hover:opacity-70">Good Future</a>
           <a href="/speaking/press-kit" className="hover:opacity-70">Press Kit</a>
           <a href="https://ingoodco.substack.com" className="hover:opacity-70">Substack</a>
-          <a href="/speaking#book" className="hover:opacity-70">Contact</a>
+          <a href="/speaking#book" className="col-span-2 hover:opacity-70 sm:col-span-1">Contact</a>
         </nav>
         <span className="text-xs" style={{ color: "#777" }}>© {new Date().getFullYear()} IN GOOD CO</span>
       </div>

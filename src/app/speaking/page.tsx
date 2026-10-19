@@ -405,7 +405,9 @@ export default function SpeakingPage() {
             <h2 className="speaking-display text-4xl sm:text-5xl">Writing about us?</h2>
             <p className="mt-2 text-base">Bios, approved photos, logos, and contact details, all in one place.</p>
           </div>
-          <Btn href="/speaking/press-kit" variant="outline">View the press kit</Btn>
+          <div className="self-start sm:self-auto">
+            <Btn href="/speaking/press-kit" variant="outline">View the press kit</Btn>
+          </div>
         </div>
       </section>
 
