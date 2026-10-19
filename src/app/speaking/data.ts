@@ -152,5 +152,51 @@ export const LINKS = [
   { label: "LinkedIn", handle: "in/kirstenludwig", href: "https://www.linkedin.com/in/kirstenludwig/" },
 ];
 
-// Real quotes only. The "What people say" sections stay hidden until this has entries.
-export const TESTIMONIALS: { quote: string; who: string }[] = [];
+// Real quotes only, from the "LOVE FOR GOOD THINKING" Google Doc.
+// Talks/sessions first, then newsletter love from big-name leaders.
+export const TESTIMONIALS: { quote: string; who: string }[] = [
+  {
+    quote: "Thank you for such a compelling presentation today. The team was energized and excited to have a different take on what trends are shaping marketing and culture right now. Appreciate you both.",
+    who: "Lara Balazs, CMO, Adobe",
+  },
+  {
+    quote: "Kirsten and Chris are two of the very best in the business. Their insights speed round session was clear, practical, engaging, and genuinely useful. It sparked ideas my team can put to work immediately.",
+    who: "Allison Staad, CMO, Ollie",
+  },
+  {
+    quote: "Chris writes GOOD THINKING which many marketers consider to be the most interesting and relevant newsletter on brands and culture right now.",
+    who: "Jenny Olson, CMO, Herman Miller",
+  },
+  {
+    quote: "I pore through your weekly newsletter and dive into virtually every link. I also find myself forwarding it to many of the companies I work with.",
+    who: "Tony Weisman, Board Member, Klaviyo · Former CMO, Dunkin'",
+  },
+  {
+    quote: "I'm a huge fan and have read nearly everything you've published. I'm truly impressed by the way you gather such extensive data and transform it into something so clear and easy to understand.",
+    who: "Mark Johnson, Director of Retail Experience & Innovation, Target",
+  },
+  {
+    quote: "I have pretty much unsubscribed from everything else at this point, but I felt yours was a must keep. I find a few gems in there each week.",
+    who: "Aaron Levant, CEO, Complex · Co-Founder, TRUFF",
+  },
+];
+
+// Guests on the CMO dinners (shown in the dinners section).
+export const DINNER_QUOTES: { quote: string; who: string }[] = [
+  {
+    quote: "You definitely collected the most interesting (and generous) people at Cannes! I got some great ideas and follow ups for sure!!",
+    who: "Claudine Cheever, CMO, Pinterest",
+  },
+  {
+    quote: "Truly one of the highlights of the week was your dinner. Thanks for including me.",
+    who: "Meghan Gendelman, B2B CMO, Canva",
+  },
+];
+
+// "Follow along" cards on the speaking page.
+export const SOCIALS = [
+  { platform: "Substack", handle: "GOOD THINKING", href: "https://ingoodco.substack.com", icon: "substack" },
+  { platform: "YouTube", handle: "GOOD THINKING", href: "https://www.youtube.com/channel/UChgJqNTNTPweoIPESAZ-68A", icon: "youtube" },
+  { platform: "LinkedIn", handle: "Chris Danton", href: "https://www.linkedin.com/in/chrisdanton/", icon: "linkedin" },
+  { platform: "LinkedIn", handle: "Kirsten Ludwig", href: "https://www.linkedin.com/in/kirstenludwig/", icon: "linkedin" },
+] as const;

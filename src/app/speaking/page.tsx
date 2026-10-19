@@ -3,7 +3,9 @@ import {
   BOOKING_EMAIL,
   BOOKING_MAILTO,
   C,
+  DINNER_QUOTES,
   FORMATS,
+  SOCIALS,
   SITE_URL,
   SPEAKERS,
   STAGES,
@@ -12,7 +14,7 @@ import {
   VIDEOS,
 } from "./data";
 import EnquiryForm from "./enquiry-form";
-import { Btn, Eyebrow, HARD_SHADOW, Pin, PinnedCard, PinnedPhoto, SpeakingFooter, SpeakingNav } from "./ui";
+import { Btn, Eyebrow, HARD_SHADOW, Pin, PinnedCard, PinnedPhoto, SocialIcon, SpeakingFooter, SpeakingNav } from "./ui";
 
 export const metadata: Metadata = {
   title: "Keynote Speakers on Brand, Culture & the Future · Kirsten Ludwig & Chris Danton",
@@ -42,6 +44,13 @@ export const metadata: Metadata = {
 
 // Dinner photos. Add the menu shot as a second entry and the two will pin side by side.
 const DINNER_PHOTOS = [{ src: "/speaking/dinner-1.jpg", alt: "Kirsten Ludwig and Chris Danton at a GOOD THINKING CMO dinner" }];
+
+const SOCIAL_STYLES = [
+  { bg: C.yellow, fg: C.black, pin: C.black, tilt: -1.5 },
+  { bg: C.black, fg: C.white, pin: C.yellow, tilt: 1 },
+  { bg: C.cream, fg: C.black, pin: C.yellow, tilt: -0.75 },
+  { bg: C.yellow, fg: C.black, pin: C.black, tilt: 1.25 },
+];
 
 // Talk cards cycle through the brand colors and tilt a little, like notes pinned to a board.
 const CARD_STYLES = [
@@ -150,14 +159,14 @@ export default function SpeakingPage() {
 
       {/* Talks */}
       <section id="talks" style={{ background: C.cream }}>
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 md:py-20">
           <Eyebrow>The Talks</Eyebrow>
           <h2 className="speaking-display mt-3 text-5xl md:text-7xl">Book us for your stage</h2>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed">
             Every talk is tailored to your audience and shaped with you ahead of the date. Formats
             range from a 20-minute provocation to a half-day working session.
           </p>
-          <div className="mt-14 grid gap-x-7 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-x-7 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {TALKS.map((t, i) => {
               const s = CARD_STYLES[i % CARD_STYLES.length];
               return (
@@ -187,48 +196,35 @@ export default function SpeakingPage() {
               </a>
             </PinnedCard>
           </div>
-          <p className="mt-14 text-[15px]">
+          <p className="mt-10 text-[15px]">
             <span className="font-bold">Formats:</span> {FORMATS.join(" · ")}
           </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {[
-              "Brand",
-              "Marketing",
-              "Culture",
-              "Consumer Trends",
-              "Futures & Foresight",
-              "Creativity",
-              "Personal Brand",
-              "The Future of Brand",
-            ].map((t) => (
-              <span key={t} className="border-2 border-black text-xs font-semibold uppercase tracking-wide px-3 py-1.5">
-                {t}
-              </span>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* Speakers */}
       <section id="speakers" style={{ background: C.white }}>
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 md:py-20">
           <Eyebrow>The Speakers</Eyebrow>
           <h2 className="speaking-display mt-3 text-5xl md:text-7xl">Meet Kirsten &amp; Chris</h2>
-          <div className="mt-14 grid gap-14 sm:grid-cols-2 lg:gap-20">
+          <div className="mt-10 grid gap-12 lg:grid-cols-2 lg:gap-14">
             {SPEAKERS.map((s, i) => (
-              <div key={s.name}>
+              <div key={s.name} className="grid grid-cols-[40%_1fr] items-start gap-6 sm:gap-8">
                 <PinnedPhoto
                   src={s.img}
                   alt={s.name}
                   tilt={i === 0 ? -2 : 2}
                   pin={i === 0 ? C.yellow : C.black}
+                  className="mt-3"
                   imgClassName="aspect-[4/5] object-cover object-top grayscale"
                 />
-                <h3 className="speaking-display mt-10 text-4xl sm:text-5xl">{s.name}</h3>
-                <p className="mt-2 inline-block px-2 py-0.5 text-xs font-bold uppercase tracking-widest" style={{ background: C.yellow }}>
-                  {s.role}
-                </p>
-                <p className="mt-4 max-w-md text-base sm:text-lg leading-relaxed">{s.bio}</p>
+                <div>
+                  <h3 className="speaking-display text-3xl sm:text-4xl">{s.name}</h3>
+                  <p className="mt-2 inline-block px-2 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest" style={{ background: C.yellow }}>
+                    {s.role}
+                  </p>
+                  <p className="mt-4 text-[15px] leading-relaxed">{s.bio}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -237,21 +233,23 @@ export default function SpeakingPage() {
 
       {/* On stage */}
       <section id="stages" style={{ background: C.black, color: C.white }}>
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 md:py-20">
           <Eyebrow color={C.yellow}>On Stage</Eyebrow>
           <h2 className="speaking-display mt-3 text-5xl md:text-7xl">See us in the room</h2>
-          <div className="mt-12 border-2" style={{ borderColor: C.yellow, boxShadow: `8px 8px 0 0 ${C.yellow}` }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/speaking/paradigms-culture.jpg"
-              alt="Kirsten Ludwig and Chris Danton on stage at Paradigms"
-              className="w-full h-[320px] sm:h-[460px] lg:h-[560px] object-cover object-[center_80%]"
-            />
-          </div>
-          <p className="mt-5 text-xs font-bold uppercase tracking-widest" style={{ color: C.yellow }}>Paradigms</p>
-          <div className="mt-14 grid gap-10 md:grid-cols-2 lg:gap-12">
+          <figure className="mt-10">
+            <div className="border-2" style={{ borderColor: C.yellow, boxShadow: `8px 8px 0 0 ${C.yellow}` }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/speaking/paradigms-culture.jpg"
+                alt="Kirsten Ludwig and Chris Danton on stage at Paradigms"
+                className="w-full h-[320px] sm:h-[460px] lg:h-[560px] object-cover object-[center_80%]"
+              />
+            </div>
+            <figcaption className="mt-5 text-xs font-bold uppercase tracking-widest" style={{ color: C.yellow }}>Paradigms</figcaption>
+          </figure>
+          <div className="mt-12 grid gap-8 md:grid-cols-2">
             {VIDEOS.map((v) => (
-              <div key={v.id}>
+              <figure key={v.id}>
                 <div className="relative w-full aspect-video border-2" style={{ borderColor: "#333" }}>
                   <iframe
                     className="absolute inset-0 w-full h-full"
@@ -262,8 +260,8 @@ export default function SpeakingPage() {
                     allowFullScreen
                   />
                 </div>
-                <p className="mt-3 text-xs font-bold uppercase tracking-widest" style={{ color: C.yellow }}>{v.title}</p>
-              </div>
+                <figcaption className="mt-3 text-xs font-bold uppercase tracking-widest" style={{ color: C.yellow }}>{v.title}</figcaption>
+              </figure>
             ))}
           </div>
         </div>
@@ -272,13 +270,13 @@ export default function SpeakingPage() {
       {/* What people say (hidden until real quotes are added in data.ts) */}
       {TESTIMONIALS.length > 0 && (
         <section style={{ background: C.yellow, color: C.black }}>
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 md:py-28">
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 md:py-20">
             <Eyebrow>Kind Words</Eyebrow>
             <h2 className="speaking-display mt-3 text-5xl md:text-7xl">What people say</h2>
-            <div className="mt-12 grid gap-8 md:grid-cols-2">
-              {TESTIMONIALS.map((t) => (
-                <blockquote key={t.quote} className="border-2 border-black p-7 sm:p-9" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
-                  <p className="text-lg leading-relaxed">“{t.quote}”</p>
+            <div className="mt-10 grid gap-8 md:grid-cols-3">
+              {TESTIMONIALS.slice(0, 3).map((t) => (
+                <blockquote key={t.quote} className="border-2 border-black p-6 sm:p-7" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
+                  <p className="text-base leading-relaxed">“{t.quote}”</p>
                   <footer className="mt-5 text-xs font-bold uppercase tracking-[0.15em]">{t.who}</footer>
                 </blockquote>
               ))}
@@ -289,7 +287,7 @@ export default function SpeakingPage() {
 
       {/* CMO Dinners */}
       <section id="dinners" style={{ background: C.paper, color: C.black }}>
-        <div className="mx-auto grid max-w-6xl gap-14 px-4 py-14 sm:px-6 sm:py-20 md:py-28 lg:grid-cols-2 lg:items-center lg:gap-16">
+        <div className="mx-auto grid max-w-6xl gap-14 px-4 py-14 sm:px-6 sm:py-16 md:py-20 lg:grid-cols-2 lg:items-center lg:gap-16">
           <div>
             <Eyebrow>Convenings</Eyebrow>
             <h2 className="speaking-display mt-3 text-5xl md:text-7xl">CMO Dinners</h2>
@@ -304,8 +302,7 @@ export default function SpeakingPage() {
                 never recorded.
               </p>
               <p>
-                It&apos;s the conversation at 8pm when the agenda falls away. When someone says the
-                thing you&apos;ve been thinking all week but couldn&apos;t say on stage.
+                The conversation at 8pm, when someone says what they couldn&apos;t say on stage.
               </p>
             </div>
             <p className="speaking-display mt-8 text-2xl sm:text-3xl">
@@ -329,6 +326,14 @@ export default function SpeakingPage() {
           ) : (
             <PinnedPhoto src={DINNER_PHOTOS[0].src} alt={DINNER_PHOTOS[0].alt} tilt={-1.5} pin={C.yellow} imgClassName="aspect-[4/3] object-cover" />
           )}
+          <div className="grid gap-8 md:grid-cols-2 lg:col-span-2">
+            {DINNER_QUOTES.map((q) => (
+              <blockquote key={q.who} className="border-l-4 pl-5" style={{ borderColor: C.black }}>
+                <p className="text-base sm:text-lg italic leading-relaxed">“{q.quote}”</p>
+                <footer className="mt-2 text-xs font-bold uppercase tracking-[0.15em]">{q.who}</footer>
+              </blockquote>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -354,6 +359,40 @@ export default function SpeakingPage() {
           <div className="relative border-2 border-black p-6 pt-10 sm:p-9 sm:pt-12" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
             <Pin color={C.black} />
             <EnquiryForm />
+          </div>
+        </div>
+      </section>
+
+      {/* Follow along */}
+      <section id="follow" style={{ background: C.white, color: C.black }}>
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 md:py-20">
+          <Eyebrow>Everywhere</Eyebrow>
+          <h2 className="speaking-display mt-3 text-5xl md:text-7xl">Follow along</h2>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed">
+            The letter every week, the conversation behind it, and what we&apos;re seeing in between.
+          </p>
+          <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
+            {SOCIALS.map((so, i) => {
+              const st = SOCIAL_STYLES[i % SOCIAL_STYLES.length];
+              return (
+                <a
+                  key={so.href}
+                  href={so.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative flex min-h-44 flex-col justify-between border-2 border-black p-6 pt-9 transition-transform duration-200 hover:-translate-y-1.5"
+                  style={{ background: st.bg, color: st.fg, transform: `rotate(${st.tilt}deg)`, boxShadow: "5px 5px 0 0 #000" }}
+                >
+                  <Pin color={st.pin} />
+                  <span aria-hidden="true" className="absolute right-5 top-9 text-xl">↗</span>
+                  <SocialIcon name={so.icon} />
+                  <span className="mt-8">
+                    <span className="speaking-display block text-3xl">{so.platform}</span>
+                    <span className="mt-1 block text-sm font-medium opacity-80">{so.handle}</span>
+                  </span>
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>
