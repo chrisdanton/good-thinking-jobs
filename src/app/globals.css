@@ -173,13 +173,13 @@
 /* Outlined (stroke-only) display text, echoing the futures subscribe styling. */
 .speaking-outline {
   color: transparent;
-  -webkit-text-stroke: 1.5px #fff;
-  text-stroke: 1.5px #fff;
+  -webkit-text-stroke: 1px #fff;
+  text-stroke: 1px #fff;
 }
 .speaking-outline-dark {
   color: transparent;
-  -webkit-text-stroke: 1.5px #000;
-  text-stroke: 1.5px #000;
+  -webkit-text-stroke: 1px #000;
+  text-stroke: 1px #000;
 }
 /* Press kit "Save as PDF": print just the content, keep the section colors. */
 @media print {
