@@ -113,13 +113,13 @@ export default function PressKitPdf() {
             {TALKS.map((t, i) => {
               const s = TALK_STYLES[i % TALK_STYLES.length];
               return (
-                <div key={t.no} className="border-2 border-black p-[5mm]" style={{ background: s.bg, color: s.fg }}>
+                <div key={t.no} className="border-[1.5px] border-black p-[5mm]" style={{ background: s.bg, color: s.fg }}>
                   <h3 className="speaking-display text-[22px]">{t.title}</h3>
                   <p className="mt-2 text-[9.5px] leading-[1.55]">{t.body}</p>
                 </div>
               );
             })}
-            <div className="flex flex-col justify-center border-2 border-black p-[5mm]" style={{ background: C.paper }}>
+            <div className="flex flex-col justify-center border-[1.5px] border-black p-[5mm]" style={{ background: C.paper }}>
               <h3 className="speaking-display text-[22px]">Something else?</h3>
               <p className="mt-2 text-[9.5px] leading-[1.55]">Every talk is tailored to your audience and shaped with you ahead of the date, from a 20-minute provocation to a half-day working session. Tell us about the room.</p>
             </div>
@@ -213,7 +213,7 @@ export default function PressKitPdf() {
 
           <div className="mt-[6mm] grid grid-cols-3 gap-[4mm]">
             {PRESS_PHOTOS.map((ph) => (
-              <figure key={ph.file} className="border-2 border-black p-[2mm] pb-[1.5mm]" style={{ background: C.white, boxShadow: "3px 3px 0 0 #000" }}>
+              <figure key={ph.file} className="border-[1.5px] border-black p-[2mm] pb-[1.5mm]" style={{ background: C.white, boxShadow: "3px 3px 0 0 #000" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={ph.src} alt={ph.caption} className={`aspect-[4/5] w-full object-cover ${ph.pos}`} />
                 <figcaption className="mt-[1.5mm] text-[8.5px]" style={{ color: "#444" }}>{ph.caption}</figcaption>
@@ -221,7 +221,7 @@ export default function PressKitPdf() {
             ))}
           </div>
 
-          <div className="mt-[7mm] border-2 border-black p-[6mm]" style={{ background: C.white, boxShadow: "5px 5px 0 0 #000" }}>
+          <div className="mt-[7mm] border-[1.5px] border-black p-[6mm]" style={{ background: C.white, boxShadow: "5px 5px 0 0 #000" }}>
             <Kicker>Contact</Kicker>
             <p className="speaking-display mt-2 text-[24px] underline underline-offset-4">{BOOKING_EMAIL}</p>
             <p className="mt-[3mm] text-[10.5px] leading-[1.8]">

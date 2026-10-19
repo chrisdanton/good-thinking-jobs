@@ -17,7 +17,7 @@ export function CopyButton({ text }: { text: string }) {
           // Clipboard blocked: leave the text selectable on the page.
         }
       }}
-      className="speaking-noprint border-2 border-black px-4 py-1.5 text-xs font-bold uppercase tracking-wide"
+      className="speaking-noprint border-[1.5px] border-black px-4 py-1.5 text-xs font-bold uppercase tracking-wide"
       style={{ background: copied ? "#F9FF00" : "transparent", color: "#000" }}
     >
       {copied ? "Copied" : "Copy"}

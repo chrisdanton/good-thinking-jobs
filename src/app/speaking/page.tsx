@@ -238,7 +238,7 @@ export default function SpeakingPage() {
           <Eyebrow color={C.yellow}>On Stage</Eyebrow>
           <h2 className="speaking-display mt-3 text-4xl sm:text-5xl md:text-7xl">See us in the room</h2>
           <figure className="mt-16">
-            <div className="border-2" style={{ borderColor: C.yellow, boxShadow: `8px 8px 0 0 ${C.yellow}` }}>
+            <div className="border-[1.5px]" style={{ borderColor: C.yellow, boxShadow: `8px 8px 0 0 ${C.yellow}` }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/speaking/paradigms-culture.jpg"
@@ -251,7 +251,7 @@ export default function SpeakingPage() {
           <div className="mt-16 grid gap-10 md:grid-cols-2">
             {VIDEOS.map((v) => (
               <figure key={v.id}>
-                <div className="relative w-full aspect-video border-2" style={{ borderColor: "#333" }}>
+                <div className="relative w-full aspect-video border-[1.5px]" style={{ borderColor: "#333" }}>
                   <iframe
                     className="absolute inset-0 w-full h-full"
                     src={`https://www.youtube.com/embed/${v.id}`}
@@ -276,7 +276,7 @@ export default function SpeakingPage() {
             <h2 className="speaking-display mt-3 text-4xl sm:text-5xl md:text-7xl">What people say</h2>
             <div className="mt-16 grid gap-10 md:grid-cols-3">
               {TESTIMONIALS.slice(0, 3).map((t) => (
-                <blockquote key={t.quote} className="border-2 border-black p-6 sm:p-7" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
+                <blockquote key={t.quote} className="border-[1.5px] border-black p-6 sm:p-7" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
                   <p className="text-base leading-relaxed">“{t.quote}”</p>
                   <footer className="mt-5 text-xs font-bold uppercase tracking-[0.15em]">{t.who}</footer>
                 </blockquote>
@@ -357,7 +357,7 @@ export default function SpeakingPage() {
               </a>
             </p>
           </div>
-          <div className="relative border-2 border-black p-6 pt-10 sm:p-9 sm:pt-12" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
+          <div className="relative border-[1.5px] border-black p-6 pt-10 sm:p-9 sm:pt-12" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
             <Pin color={C.black} />
             <EnquiryForm />
           </div>
@@ -381,7 +381,7 @@ export default function SpeakingPage() {
                   href={so.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative flex min-h-44 flex-col justify-between border-2 border-black p-6 pt-9 transition-transform duration-200 hover:-translate-y-1.5"
+                  className="group relative flex min-h-44 flex-col justify-between border-[1.5px] border-black p-6 pt-9 transition-transform duration-200 hover:-translate-y-1.5"
                   style={{ background: st.bg, color: st.fg, transform: `rotate(${st.tilt}deg)`, boxShadow: "5px 5px 0 0 #000" }}
                 >
                   <Pin color={st.pin} />

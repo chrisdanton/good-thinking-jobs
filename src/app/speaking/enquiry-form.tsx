@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const TOPICS = ["Keynote", "Workshop", "Host a dinner", "Press & media", "Something else"];
 
-const inputClass = "mt-1.5 w-full border-2 border-black px-3 py-2.5 text-[15px] font-normal normal-case tracking-normal outline-none focus:bg-[#FFFFE0]";
+const inputClass = "mt-1.5 w-full border-[1.5px] border-black px-3 py-2.5 text-[15px] font-normal normal-case tracking-normal outline-none focus:bg-[#FFFFE0]";
 const inputStyle = { background: "#fff", color: "#000", borderRadius: 0 };
 const labelClass = "block text-xs font-bold uppercase tracking-[0.12em]";
 
@@ -96,7 +96,7 @@ export default function EnquiryForm() {
       <button
         type="submit"
         disabled={state === "sending"}
-        className="border-2 border-black px-8 py-4 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+        className="border-[1.5px] border-black px-8 py-4 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5 disabled:opacity-60"
         style={{ background: "#000", color: "#fff" }}
       >
         {state === "sending" ? "Sending…" : "Send enquiry"}

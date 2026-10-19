@@ -10,7 +10,7 @@ export function Pin({ color = C.yellow }: { color?: string }) {
   return (
     <span
       aria-hidden="true"
-      className="absolute -top-2.5 left-1/2 z-10 h-5 w-5 -translate-x-1/2 rounded-full border-2 border-black"
+      className="absolute -top-2.5 left-1/2 z-10 h-5 w-5 -translate-x-1/2 rounded-full border-[1.5px] border-black"
       style={{ background: color, borderRadius: 9999, boxShadow: "2px 3px 0 rgba(0,0,0,0.35)" }}
     />
   );
@@ -35,7 +35,7 @@ export function PinnedPhoto({
   return (
     <div className={`relative ${className}`} style={{ transform: `rotate(${tilt}deg)` }}>
       <Pin color={pin} />
-      <figure className="border-2 border-black p-3 pb-8" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
+      <figure className="border-[1.5px] border-black p-3 pb-8" style={{ background: C.white, boxShadow: HARD_SHADOW }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt={alt} className={`w-full ${imgClassName}`} />
       </figure>
@@ -67,7 +67,7 @@ export function PinnedCard({
   };
   return (
     <div
-      className={`relative border-2 border-black p-7 pt-10 transition-transform duration-200 hover:-translate-y-1 ${className}`}
+      className={`relative border-[1.5px] border-black p-7 pt-10 transition-transform duration-200 hover:-translate-y-1 ${className}`}
       style={style}
     >
       <Pin color={pin} />
@@ -130,7 +130,7 @@ export function Btn({
       download={download || undefined}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="inline-block border-2 px-7 py-3.5 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5"
+      className="inline-block border-[1.5px] px-7 py-3.5 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5"
       style={style}
     >
       {children}
@@ -166,7 +166,7 @@ export function SpeakingNav({ active }: { active?: "press" }) {
         </nav>
         <a
           href="/speaking#book"
-          className="justify-self-end border-2 border-black px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wide"
+          className="justify-self-end border-[1.5px] border-black px-4 py-2 text-xs sm:text-sm font-bold uppercase tracking-wide"
           style={{ background: C.yellow, color: C.black }}
         >
           Book us

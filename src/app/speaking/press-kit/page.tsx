@@ -97,7 +97,7 @@ export default function PressKitPage() {
           <h2 className="speaking-display text-4xl md:text-6xl">What we talk about</h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TALKS.map((t) => (
-              <div key={t.no} className="border-2 border-black p-6" style={{ background: C.white, boxShadow: HARD_SHADOW_SM }}>
+              <div key={t.no} className="border-[1.5px] border-black p-6" style={{ background: C.white, boxShadow: HARD_SHADOW_SM }}>
                 <p className="speaking-display text-xl opacity-50">{t.no}</p>
                 <h3 className="speaking-display mt-1 text-2xl sm:text-3xl">{t.title}</h3>
                 <p className="mt-2.5 leading-relaxed">{t.short}</p>
@@ -193,7 +193,7 @@ export default function PressKitPage() {
           <div className="mt-6 grid gap-8 sm:grid-cols-2">
             {PRESS_LOGOS.map((l) => (
               <figure key={l.src}>
-                <div className={`flex h-44 items-center justify-center border-2 border-black ${l.pad}`} style={{ background: l.tile }}>
+                <div className={`flex h-44 items-center justify-center border-[1.5px] border-black ${l.pad}`} style={{ background: l.tile }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={l.src} alt={`${l.brand} logo`} className="h-full w-full object-contain" />
                 </div>
@@ -213,7 +213,7 @@ export default function PressKitPage() {
       <section style={{ background: C.white }}>
         <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-28">
           <h2 className="speaking-display text-4xl md:text-6xl">Links &amp; contact</h2>
-          <div className="mt-10 border-2 border-black" style={{ boxShadow: HARD_SHADOW_SM }}>
+          <div className="mt-10 border-[1.5px] border-black" style={{ boxShadow: HARD_SHADOW_SM }}>
             {LINKS.map((l, i) => (
               <a
                 key={l.href}
@@ -229,13 +229,13 @@ export default function PressKitPage() {
             ))}
           </div>
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
-            <div className="border-2 border-black p-6" style={{ background: C.yellow, boxShadow: HARD_SHADOW_SM }}>
+            <div className="border-[1.5px] border-black p-6" style={{ background: C.yellow, boxShadow: HARD_SHADOW_SM }}>
               <p className="text-[11px] font-bold uppercase tracking-[0.25em]">Press &amp; interviews</p>
               <a href={PRESS_MAILTO} className="speaking-display mt-2 block text-2xl sm:text-3xl break-all underline decoration-2 underline-offset-4">
                 {BOOKING_EMAIL}
               </a>
             </div>
-            <div className="border-2 border-black p-6" style={{ background: C.cream, boxShadow: HARD_SHADOW_SM }}>
+            <div className="border-[1.5px] border-black p-6" style={{ background: C.cream, boxShadow: HARD_SHADOW_SM }}>
               <p className="text-[11px] font-bold uppercase tracking-[0.25em]">Booking a talk?</p>
               <a href="/speaking" className="speaking-display mt-2 block text-2xl sm:text-3xl underline decoration-2 underline-offset-4">
                 See the speaking page ↗
