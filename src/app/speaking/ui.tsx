@@ -67,7 +67,7 @@ export function PinnedCard({
   };
   return (
     <div
-      className={`relative border-2 border-black p-6 pt-9 transition-transform duration-200 hover:-translate-y-1 ${className}`}
+      className={`relative border-2 border-black p-7 pt-10 transition-transform duration-200 hover:-translate-y-1 ${className}`}
       style={style}
     >
       <Pin color={pin} />
@@ -150,7 +150,7 @@ export function SpeakingNav({ active }: { active?: "press" }) {
   return (
     <div className="speaking-noprint border-b-2 border-black" style={{ background: C.cream, color: C.black }}>
       {/* Same side padding as the GlobalBar above, so BOOK US lines up with its IN GOOD CO logo. */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-3 sm:px-8 lg:px-12">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-3 sm:px-8 lg:px-12">
         <span aria-hidden="true" />
         <nav className="hidden md:flex items-center gap-7 text-sm font-semibold">
           {NAV.map((n) => (
@@ -179,7 +179,7 @@ export function SpeakingNav({ active }: { active?: "press" }) {
 export function SpeakingFooter() {
   return (
     <footer className="speaking-noprint" style={{ background: C.black, color: C.white }}>
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="mx-auto max-w-6xl px-6 py-12 sm:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="GOOD THINKING" className="h-6 w-auto" />

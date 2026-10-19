@@ -11,7 +11,6 @@ import {
   PRESS_PHOTOS,
   PRESS_ZIP,
   TALKS,
-  TESTIMONIALS,
 } from "../data";
 import { CopyButton } from "../buttons";
 import { Btn, HARD_SHADOW_SM, PinnedPhoto, SpeakingFooter, SpeakingNav } from "../ui";
@@ -54,7 +53,7 @@ export default function PressKitPage() {
 
       {/* Hero */}
       <section style={{ background: C.yellow, color: C.black }}>
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[7fr_4fr] lg:items-center lg:gap-16">
+        <div className="mx-auto grid max-w-6xl gap-16 px-6 py-20 sm:px-10 sm:py-28 lg:grid-cols-[7fr_4fr] lg:items-center lg:gap-16">
           <div>
             <h1 className="speaking-display text-[clamp(3.6rem,12vw,8rem)]">Press Kit</h1>
             <p className="mt-7 max-w-xl text-lg sm:text-xl leading-relaxed">
@@ -79,7 +78,7 @@ export default function PressKitPage() {
 
       {/* At a glance */}
       <section style={{ background: C.black, color: C.white }}>
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-16">
           <h2 className="speaking-display text-4xl md:text-5xl" style={{ color: C.yellow }}>At a glance</h2>
           <dl className="mt-8 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
             {FACTS.map(([k, v]) => (
@@ -94,7 +93,7 @@ export default function PressKitPage() {
 
       {/* Talks */}
       <section style={{ background: C.cream }}>
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-28">
           <h2 className="speaking-display text-4xl md:text-6xl">What we talk about</h2>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TALKS.map((t) => (
@@ -111,30 +110,9 @@ export default function PressKitPage() {
         </div>
       </section>
 
-      {/* What people say (hidden until real quotes are added in data.ts) */}
-      {TESTIMONIALS.length > 0 && (
-        <section style={{ background: C.black, color: C.white }}>
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
-            <h2 className="speaking-display text-4xl md:text-6xl" style={{ color: C.yellow }}>What people say</h2>
-            <div className="mt-10 space-y-8">
-              {TESTIMONIALS.map((t) => (
-                <blockquote
-                  key={t.quote}
-                  className="p-7 sm:p-9"
-                  style={{ background: C.white, color: C.black, boxShadow: `10px 10px 0 0 ${C.yellow}` }}
-                >
-                  <p className="text-lg leading-relaxed">“{t.quote}”</p>
-                  <footer className="mt-5 text-xs font-bold uppercase tracking-[0.15em]">{t.who}</footer>
-                </blockquote>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Bios */}
       <section style={{ background: C.white }}>
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-28">
           <h2 className="speaking-display text-4xl md:text-6xl">Bios</h2>
           <p className="mt-4 max-w-2xl" style={{ color: "#555" }}>
             Three lengths for each. Use whichever fits. Please don&apos;t paraphrase the first line.
@@ -181,7 +159,7 @@ export default function PressKitPage() {
 
       {/* Approved photos */}
       <section style={{ background: C.paper }}>
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-28">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
               <h2 className="speaking-display text-4xl md:text-6xl">Approved photos</h2>
@@ -233,7 +211,7 @@ export default function PressKitPage() {
 
       {/* Links & contact */}
       <section style={{ background: C.white }}>
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10 sm:py-28">
           <h2 className="speaking-display text-4xl md:text-6xl">Links &amp; contact</h2>
           <div className="mt-10 border-2 border-black" style={{ boxShadow: HARD_SHADOW_SM }}>
             {LINKS.map((l, i) => (
