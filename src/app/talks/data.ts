@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// GOOD SESSIONS: the one file to edit.
+// GOOD TALKS: the one file to edit.
 //
 // ADD A SESSION: copy one { ... } block below, paste it at the top of the list,
 // and change the details. Save, commit, push. That's it.

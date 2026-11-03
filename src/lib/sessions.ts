@@ -1,6 +1,6 @@
-// GOOD SESSIONS helpers: sorting into upcoming/past, date labels, and
-// add-to-calendar links. Session content itself lives in src/app/sessions/data.ts.
-import { SESSIONS } from "@/app/sessions/data";
+// GOOD TALKS helpers: sorting into upcoming/past, date labels, and
+// add-to-calendar links. Session content itself lives in src/app/talks/data.ts.
+import { SESSIONS } from "@/app/talks/data";
 
 export type Session = {
   slug: string;
@@ -95,16 +95,16 @@ export function timeLabel(s: Session) {
 const icsStamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 function details(s: Session) {
-  return `${s.description}\n\nA GOOD SESSION for GOOD THINKING paid members.\n${s.accessUrl || `${SITE_URL}/sessions`}`;
+  return `${s.description}\n\nA GOOD TALK for GOOD THINKING paid members.\n${s.accessUrl || `${SITE_URL}/talks`}`;
 }
 
 export function googleCalUrl(s: Session) {
   const p = new URLSearchParams({
     action: "TEMPLATE",
-    text: `GOOD SESSIONS: ${s.title}`,
+    text: `GOOD TALKS: ${s.title}`,
     dates: `${icsStamp(startDate(s))}/${icsStamp(endDate(s))}`,
     details: details(s),
-    location: s.accessUrl || `${SITE_URL}/sessions`,
+    location: s.accessUrl || `${SITE_URL}/talks`,
   });
   return `https://calendar.google.com/calendar/render?${p.toString()}`;
 }
@@ -113,17 +113,17 @@ export function outlookCalUrl(s: Session) {
   const p = new URLSearchParams({
     path: "/calendar/action/compose",
     rru: "addevent",
-    subject: `GOOD SESSIONS: ${s.title}`,
+    subject: `GOOD TALKS: ${s.title}`,
     startdt: startDate(s).toISOString(),
     enddt: endDate(s).toISOString(),
     body: details(s),
-    location: s.accessUrl || `${SITE_URL}/sessions`,
+    location: s.accessUrl || `${SITE_URL}/talks`,
   });
   return `https://outlook.live.com/calendar/0/deeplink/compose?${p.toString()}`;
 }
 
 export function icsPath(s: Session) {
-  return `/sessions/calendar/${s.slug}`;
+  return `/talks/calendar/${s.slug}`;
 }
 
 const icsEscape = (t: string) => t.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
@@ -135,9 +135,9 @@ function icsEvent(s: Session) {
     `DTSTAMP:${icsStamp(new Date())}`,
     `DTSTART:${icsStamp(startDate(s))}`,
     `DTEND:${icsStamp(endDate(s))}`,
-    `SUMMARY:${icsEscape(`GOOD SESSIONS: ${s.title}`)}`,
+    `SUMMARY:${icsEscape(`GOOD TALKS: ${s.title}`)}`,
     `DESCRIPTION:${icsEscape(details(s))}`,
-    `URL:${s.accessUrl || `${SITE_URL}/sessions`}`,
+    `URL:${s.accessUrl || `${SITE_URL}/talks`}`,
     "END:VEVENT",
   ];
 }
@@ -146,7 +146,7 @@ function icsWrap(events: string[][], name?: string) {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//GOOD THINKING//GOOD SESSIONS//EN",
+    "PRODID:-//GOOD THINKING//GOOD TALKS//EN",
     "CALSCALE:GREGORIAN",
     ...(name ? [`X-WR-CALNAME:${name}`, "X-PUBLISHED-TTL:PT12H", "REFRESH-INTERVAL;VALUE=DURATION:PT12H"] : []),
     ...events.flat(),
@@ -164,14 +164,14 @@ export function icsFile(s: Session) {
 // re-check it every few hours, so new sessions appear on their own.
 export function icsFeed() {
   const dated = SESSIONS.filter((s) => !s.tba && s.time);
-  return icsWrap(dated.map(icsEvent), "GOOD SESSIONS");
+  return icsWrap(dated.map(icsEvent), "GOOD TALKS");
 }
 
-export const FEED_PATH = "/sessions/calendar.ics";
+export const FEED_PATH = "/talks/calendar.ics";
 const FEED_HTTPS = `${SITE_URL}${FEED_PATH}`;
 const FEED_WEBCAL = FEED_HTTPS.replace(/^https:/, "webcal:");
 export const SUBSCRIBE = {
   apple: FEED_WEBCAL,
   google: `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(FEED_WEBCAL)}`,
-  outlook: `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(FEED_HTTPS)}&name=${encodeURIComponent("GOOD SESSIONS")}`,
+  outlook: `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(FEED_HTTPS)}&name=${encodeURIComponent("GOOD TALKS")}`,
 };

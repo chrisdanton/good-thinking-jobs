@@ -7,7 +7,7 @@ export function GET(_req: Request, { params }: { params: { slug: string } }) {
   return new Response(icsFile(s), {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": `attachment; filename="good-sessions-${s.slug}.ics"`,
+      "Content-Disposition": `attachment; filename="good-talks-${s.slug}.ics"`,
     },
   });
 }

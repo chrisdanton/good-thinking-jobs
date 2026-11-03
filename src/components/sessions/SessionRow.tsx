@@ -1,4 +1,4 @@
-// GOOD SESSIONS listings, styled like a gig poster.
+// GOOD TALKS listings, styled like a gig poster.
 //   UpcomingTile: a big tilted color block with a huge date, the time in a black label.
 //   PastRow:      a compact line in a dark listing, like a venue's weekly schedule.
 import type { CSSProperties } from "react";

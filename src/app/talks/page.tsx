@@ -5,10 +5,10 @@ import { SUBSCRIBE, pastSessions, upcomingSessions } from "@/lib/sessions";
 import { SpeakingFooter } from "../speaking/ui";
 
 export const metadata: Metadata = {
-  title: "GOOD SESSIONS · GOOD THINKING",
+  title: "GOOD TALKS · GOOD THINKING",
   description: "Masterclasses, LIVE sessions, unfiltered conversations that are best for behind a paywall.",
   openGraph: {
-    title: "GOOD SESSIONS · GOOD THINKING",
+    title: "GOOD TALKS · GOOD THINKING",
     description: "Masterclasses, LIVE sessions, unfiltered conversations that are best for behind a paywall.",
     type: "website",
   },
@@ -35,7 +35,7 @@ export default function SessionsPage() {
             <h1 className="speaking-display mt-4 text-[25vw] sm:text-[11rem] lg:text-[13rem]" style={{ lineHeight: 0.82 }}>
               Good
               <br />
-              Sessions
+              Talks
             </h1>
             <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <p className="max-w-md text-lg leading-snug sm:text-xl">

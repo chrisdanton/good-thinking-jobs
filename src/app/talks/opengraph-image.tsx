@@ -1,9 +1,9 @@
-// Share image for /sessions (Slack, iMessage, LinkedIn): yellow card, big condensed type.
+// Share image for /talks (Slack, iMessage, LinkedIn): yellow card, big condensed type.
 import { ImageResponse } from "next/og";
 import { readFile } from "fs/promises";
 import path from "path";
 
-export const alt = "GOOD SESSIONS · GOOD THINKING";
+export const alt = "GOOD TALKS · GOOD THINKING";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -26,7 +26,7 @@ export default async function Image() {
       >
         <div style={{ display: "flex", flexDirection: "column", fontSize: 220, lineHeight: 0.95, letterSpacing: "-0.03em", textTransform: "uppercase" }}>
           <span>Good</span>
-          <span>Sessions</span>
+          <span>Talks</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", fontSize: 40, textTransform: "uppercase", letterSpacing: "0.02em" }}>
           <span>Masterclasses · LIVE sessions · Conversations</span>

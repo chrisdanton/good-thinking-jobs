@@ -1,6 +1,6 @@
 "use client";
 
-// Timezone picker for GOOD SESSIONS. Defaults to the visitor's own timezone,
+// Timezone picker for GOOD TALKS. Defaults to the visitor's own timezone,
 // remembers their choice in this browser, and re-renders every session time.
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
