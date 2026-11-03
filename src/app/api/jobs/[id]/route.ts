@@ -1,3 +1,4 @@
+import { marketplaceFields } from "@/lib/marketplace";
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { Job, Department, LocationType, RoleLevel, Tier } from "@/lib/types";
@@ -31,6 +32,7 @@ function rowToJob(row: Record<string, unknown>): Job {
     approvalToken: row.approval_token as string,
     createdAt: row.created_at as string,
     expiresAt: row.expires_at as string,
+    ...marketplaceFields(row),
   };
 }
 

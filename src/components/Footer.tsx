@@ -29,7 +29,7 @@ export default function Footer() {
             Jobs
           </Link>
           <Link href="/post" className="hover:text-white transition-colors">
-            Post a Job
+            + Post something
           </Link>
           <Link href="/admin" className="hover:text-white transition-colors">
             Admin

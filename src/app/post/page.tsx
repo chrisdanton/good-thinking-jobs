@@ -4,10 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DEPARTMENTS, LOCATION_TYPES, ROLE_LEVELS, TIERS, isPromoActive, PROMO_LABEL, validateSalaryForTier } from "@/lib/constants";
 import { Department, LocationType, RoleLevel, Tier } from "@/lib/types";
+import { ASK_TYPES, ASK_EXPIRY_DAYS, AskType, MarketplaceType, paramForType, typeFromParam } from "@/lib/marketplace";
 
-type Step = "tier" | "details" | "payment" | "confirmation";
+type Step = "what" | "ask" | "tier" | "details" | "payment" | "confirmation";
 
 const STEP_LABELS: Record<Step, string> = {
+  what: "Type",
+  ask: "Details",
   tier: "Plan",
   details: "Details",
   payment: "Payment",
@@ -16,7 +19,12 @@ const STEP_LABELS: Record<Step, string> = {
 
 export default function PostJobPage() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>("tier");
+  const [step, setStep] = useState<Step>("what");
+  // Jobs, Projects and Asks share this page; the first question picks which.
+  const [kind, setKind] = useState<MarketplaceType>("job");
+  const [askType, setAskType] = useState<AskType | "">("");
+  const [eventDate, setEventDate] = useState("");
+  const [askError, setAskError] = useState("");
   const [form, setForm] = useState({
     posterName: "",
     posterEmail: "",
@@ -106,6 +114,8 @@ export default function PostJobPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get("session_id");
+    // Arriving from a board tab (/post?type=projects) pre-selects that type.
+    if (params.get("type")) setKind(typeFromParam(params.get("type")));
     if (sessionId) {
       setVerifying(true);
       fetch(`/api/checkout/confirm?session_id=${sessionId}`)
@@ -154,7 +164,39 @@ export default function PostJobPage() {
       externalApplyUrl: form.externalApplyUrl,
       tier: selectedTier,
       referralCode: form.referralCode.trim(),
+      marketplaceType: kind,
     };
+  }
+
+  // Asks: free, short form, straight to review.
+  async function submitAsk(e: React.FormEvent) {
+    e.preventDefault();
+    setAskError("");
+    setBusy(true);
+    const res = await fetch("/api/jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        marketplaceType: "ask",
+        askType: askType || "other",
+        posterName: form.posterName,
+        posterEmail: form.posterEmail,
+        companyName: form.companyName,
+        companyWebsite: form.companyWebsite,
+        title: form.title,
+        description: form.description,
+        location: form.location,
+        eventDate,
+        externalApplyUrl: form.externalApplyUrl,
+      }),
+    });
+    setBusy(false);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setAskError(data.error || "Something went wrong. Please try again.");
+      return;
+    }
+    setStep("confirmation");
   }
 
   // Plan is chosen first; continuing takes the poster to the job details form.
@@ -234,7 +276,8 @@ export default function PostJobPage() {
     }
   }
 
-  const steps: Step[] = ["tier", "details", "payment", "confirmation"];
+  const steps: Step[] = kind === "ask" ? ["what", "ask", "confirmation"] : ["what", "tier", "details", "payment", "confirmation"];
+  const noun = kind === "project" ? "Project" : "Job";
   const promo = isPromoActive();
 
   // Returning from Stripe: show a verifying state / error before anything else.
@@ -286,7 +329,7 @@ export default function PostJobPage() {
       {step === "details" && (
         <form onSubmit={handleDetailsSubmit}>
           <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold uppercase font-display leading-[0.9] tracking-tight mb-8">
-            Post a Job
+            Post a {noun}
           </h1>
 
           {/* Auto-fill from an existing posting */}
@@ -484,7 +527,7 @@ export default function PostJobPage() {
             Choose Your Plan
           </h1>
           <p className="text-lg sm:text-xl text-foreground font-secondary leading-relaxed mb-6 max-w-2xl">
-            Pick the plan that fits the role. Each tier and what it includes is below. You&apos;ll add the job details next.
+            Pick the plan that fits the {kind === "project" ? "project" : "role"}. Each tier and what it includes is below. You&apos;ll add the details next.
           </p>
 
           {promo && (
@@ -542,10 +585,10 @@ export default function PostJobPage() {
 
           <div className="flex gap-4">
             <button
-              onClick={() => router.push("/jobs")}
+              onClick={() => setStep("what")}
               className="border border-white/20 text-white text-sm font-bold uppercase tracking-wider font-headline px-6 py-3 hover:border-white/40 transition-colors"
             >
-              Cancel
+              Back
             </button>
             <button
               onClick={handleTierSelect}
@@ -566,7 +609,7 @@ export default function PostJobPage() {
             Submitted
           </h1>
           <p className="text-white/70 mb-4 font-secondary text-lg leading-relaxed">
-            Your {selectedTier && TIERS[selectedTier].name} listing for{" "}
+            {kind === "ask" ? "Your ask " : <>Your {selectedTier && TIERS[selectedTier].name} listing for{" "}</>}
             <span className="text-white font-semibold">{form.title}</span> at{" "}
             <span className="text-white font-semibold">{form.companyName}</span> is in review.
           </p>
@@ -574,12 +617,138 @@ export default function PostJobPage() {
             We manually approve every listing to ensure the quality of the job board. You&apos;ll get an email at <span className="text-white">{form.posterEmail}</span> once it&apos;s live, usually within 24 hours.
           </p>
           <button
-            onClick={() => router.push("/jobs")}
+            onClick={() => router.push(kind === "job" ? "/jobs" : `/jobs?type=${paramForType(kind)}`)}
             className="bg-accent text-black text-sm font-bold uppercase tracking-wider font-headline px-8 py-3 hover:bg-accent/90 transition-colors"
           >
             Browse the Board
           </button>
         </div>
+      )}
+
+      {/* Step 0: What are you posting? */}
+      {step === "what" && (
+        <div>
+          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold uppercase font-display leading-[0.9] tracking-tight mb-10">
+            What are you posting?
+          </h1>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 max-w-5xl">
+            {([
+              { k: "job", label: "A job", sub: "Permanent and fractional roles. CMO, Brand Director, Head of Strategy." },
+              { k: "project", label: "A project", sub: "Finite paid work. Freelance, contract, interim, an 8-week sprint." },
+              { k: "ask", label: "An ask", sub: "Not a hire. A sponsor, speaker, partner, venue, collaborator or intro." },
+            ] as { k: MarketplaceType; label: string; sub: string }[]).map((o) => (
+              <button
+                key={o.k}
+                type="button"
+                onClick={() => setKind(o.k)}
+                className={`flex flex-col items-start justify-start text-left p-6 border transition-all ${
+                  kind === o.k ? "border-accent bg-accent/[0.05]" : "border-white/20 hover:border-white/40"
+                }`}
+              >
+                <span className="block font-display uppercase font-bold text-3xl sm:text-4xl leading-none">{o.label}</span>
+                <span className="block mt-3 text-sm text-muted font-secondary leading-relaxed">{o.sub}</span>
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-4">
+            <button
+              onClick={() => router.push("/jobs")}
+              className="border border-white/20 text-white text-sm font-bold uppercase tracking-wider font-headline px-6 py-3 hover:border-white/40 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => setStep(kind === "ask" ? "ask" : "tier")}
+              className="bg-accent text-black text-sm font-bold uppercase tracking-wider font-headline px-8 py-3 hover:bg-accent/90 transition-colors"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Asks: one short form */}
+      {step === "ask" && (
+        <form onSubmit={submitAsk} className="max-w-3xl">
+          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold uppercase font-display leading-[0.9] tracking-tight mb-3">
+            Post an Ask
+          </h1>
+          <p className="text-lg text-foreground font-secondary leading-relaxed mb-10">
+            Free. Reviewed by us, then live for {ASK_EXPIRY_DAYS} days.
+          </p>
+
+          <label className="block text-xs uppercase tracking-widest text-muted mb-3 font-bold">You&apos;re looking for</label>
+          <div className="flex flex-wrap gap-2 mb-8">
+            {ASK_TYPES.map((a) => (
+              <button
+                key={a.type}
+                type="button"
+                onClick={() => setAskType(a.type)}
+                className={`px-4 py-2 text-sm font-bold uppercase tracking-wider font-headline border transition-colors ${
+                  askType === a.type ? "bg-accent text-black border-accent" : "border-white/20 hover:border-white/40"
+                }`}
+              >
+                {a.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid gap-5">
+            <label className="block">
+              <span className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">Headline</span>
+              <input required value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="Looking for a headline sponsor for our Cannes dinner" className="w-full" />
+            </label>
+            <label className="block">
+              <span className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">What you need</span>
+              <textarea required rows={5} value={form.description} onChange={(e) => update("description", e.target.value)} className="w-full" />
+            </label>
+            <div className="grid sm:grid-cols-2 gap-5">
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">Company or organization</span>
+                <input required value={form.companyName} onChange={(e) => update("companyName", e.target.value)} className="w-full" />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">Where</span>
+                <input value={form.location} onChange={(e) => update("location", e.target.value)} placeholder="Cannes, Remote, NYC…" className="w-full" />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">Event date (optional)</span>
+                <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="w-full" />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">Where people respond</span>
+                <input required value={form.externalApplyUrl} onChange={(e) => update("externalApplyUrl", e.target.value)} placeholder="https://… or mailto:you@…" className="w-full" />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">Your name</span>
+                <input required value={form.posterName} onChange={(e) => update("posterName", e.target.value)} className="w-full" />
+              </label>
+              <label className="block">
+                <span className="block text-xs uppercase tracking-widest text-muted mb-2 font-bold">Your email</span>
+                <input required type="email" value={form.posterEmail} onChange={(e) => update("posterEmail", e.target.value)} className="w-full" />
+              </label>
+            </div>
+          </div>
+
+          {askError && <p className="mt-6 text-sm font-bold" style={{ color: "#ff6b6b" }}>{askError}</p>}
+
+          <div className="flex gap-4 mt-10">
+            <button
+              type="button"
+              onClick={() => setStep("what")}
+              className="border border-white/20 text-white text-sm font-bold uppercase tracking-wider font-headline px-6 py-3 hover:border-white/40 transition-colors"
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              disabled={busy}
+              className="bg-accent text-black text-sm font-bold uppercase tracking-wider font-headline px-8 py-3 hover:bg-accent/90 transition-colors disabled:opacity-40"
+            >
+              {busy ? "Sending…" : "Submit for review"}
+            </button>
+          </div>
+        </form>
       )}
     </div>
   );

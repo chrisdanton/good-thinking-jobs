@@ -6,6 +6,7 @@ import Link from "next/link";
 import FeaturedBadge from "@/components/FeaturedBadge";
 import { Job } from "@/lib/types";
 import { trackJobEvent } from "@/lib/track";
+import { ASK_TYPES, paramForType } from "@/lib/marketplace";
 
 function formatSalary(min: number, max: number): string {
   if (!min && !max) return "Salary not listed";
@@ -56,11 +57,18 @@ export default function JobDetailPage() {
   }
 
   const isPremium = job.tier === "premium";
+  const kind = job.marketplaceType || "job";
+  const isAsk = kind === "ask";
+  const backHref = kind === "job" ? "/jobs" : `/jobs?type=${paramForType(kind)}`;
+  const backLabel = kind === "ask" ? "All Asks" : kind === "project" ? "All Projects" : "All Jobs";
+  const aboutLabel = kind === "ask" ? "About the Ask" : kind === "project" ? "About the Project" : "About the Role";
+  const ctaLabel = isAsk ? "Respond" : "Apply on Company Site";
+  const askLabel = ASK_TYPES.find((a) => a.type === job.askType)?.label;
 
   return (
     <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10">
-      <Link href="/jobs" className="text-sm text-muted hover:text-white transition-colors mb-8 inline-block uppercase tracking-widest">
-        &larr; All Jobs
+      <Link href={backHref} className="text-sm text-muted hover:text-white transition-colors mb-8 inline-block uppercase tracking-widest">
+        &larr; {backLabel}
       </Link>
 
       <div className="border-b border-white/10 pb-8 mb-8">
@@ -81,28 +89,47 @@ export default function JobDetailPage() {
           )}
         </p>
         <div className="flex flex-wrap gap-4 mt-6 text-sm text-muted">
-          <span>{job.location}</span>
-          <span className="text-white/20">/</span>
-          <span>{job.locationType}</span>
-          <span className="text-white/20">/</span>
-          <span>{job.department}</span>
-          <span className="text-white/20">/</span>
-          <span>{job.roleLevel}</span>
-          <span className="text-white/20">/</span>
-          <span className="text-white font-medium">{formatSalary(job.salaryMin, job.salaryMax)}</span>
+          {isAsk ? (
+            <>
+              {askLabel && (
+                <span className="text-[11px] font-bold uppercase tracking-widest px-2 py-1" style={{ background: "#F9FF00", color: "#000" }}>
+                  Seeking: {askLabel}
+                </span>
+              )}
+              <span>{job.location}</span>
+              {job.eventDate && (
+                <>
+                  <span className="text-white/20">/</span>
+                  <span>{formatDate(job.eventDate + "T12:00:00Z")}</span>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <span>{job.location}</span>
+              <span className="text-white/20">/</span>
+              <span>{job.locationType}</span>
+              <span className="text-white/20">/</span>
+              <span>{job.department}</span>
+              <span className="text-white/20">/</span>
+              <span>{job.roleLevel}</span>
+              <span className="text-white/20">/</span>
+              <span className="text-white font-medium">{formatSalary(job.salaryMin, job.salaryMax)}</span>
+            </>
+          )}
         </div>
       </div>
 
       <div className="mb-10">
         {job.externalApplyUrl && (
           <a href={job.externalApplyUrl} onClick={() => trackJobEvent(job.id, "apply_click")} target="_blank" rel="noopener noreferrer" className="inline-block bg-accent text-black text-sm font-bold uppercase tracking-wider font-headline px-8 py-3 hover:bg-accent/90 transition-colors">
-            Apply on Company Site
+            {ctaLabel}
           </a>
         )}
       </div>
 
       <div className="mb-10">
-        <h2 className="text-xs uppercase tracking-widest text-muted mb-4 font-bold">About the Role</h2>
+        <h2 className="text-xs uppercase tracking-widest text-muted mb-4 font-bold">{aboutLabel}</h2>
         <div className="text-white/80 leading-relaxed whitespace-pre-line font-secondary text-[15px]">{job.description}</div>
       </div>
 
@@ -118,7 +145,7 @@ export default function JobDetailPage() {
         <div>
           {job.externalApplyUrl && (
             <a href={job.externalApplyUrl} onClick={() => trackJobEvent(job.id, "apply_click")} target="_blank" rel="noopener noreferrer" className="text-accent underline underline-offset-2 font-medium">
-              Apply on company site &rarr;
+              {isAsk ? "Respond" : "Apply on company site"} &rarr;
             </a>
           )}
         </div>

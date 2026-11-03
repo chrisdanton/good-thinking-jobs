@@ -18,6 +18,8 @@ export type JobStatus = "awaiting_payment" | "pending" | "active" | "rejected" |
 
 export type ApplicationStatus = "new" | "reviewed" | "archived";
 
+import type { AskType, MarketplaceType } from "./marketplace";
+
 export interface Job {
   id: string;
   posterName: string;
@@ -42,6 +44,10 @@ export interface Job {
   createdAt: string;
   expiresAt: string;
   referralCode?: string;
+  // Jobs / Projects / Asks (see lib/marketplace.ts). Absent = job.
+  marketplaceType?: MarketplaceType;
+  askType?: AskType;
+  eventDate?: string;
 }
 
 export interface Application {

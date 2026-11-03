@@ -29,7 +29,7 @@ export default function Header() {
               pathname === "/post" ? "text-white" : "text-muted hover:text-white"
             }`}
           >
-            Post a Job
+            + Post something
           </Link>
         </nav>
 

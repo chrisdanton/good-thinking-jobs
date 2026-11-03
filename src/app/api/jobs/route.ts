@@ -1,3 +1,4 @@
+import { ASK_EXPIRY_DAYS, isAskType, marketplaceFields, missingMarketplaceColumns, typeFromParam } from "@/lib/marketplace";
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { sendApprovalRequest } from "@/lib/email";
@@ -31,6 +32,7 @@ function rowToJob(row: Record<string, unknown>): Job {
     approvalToken: row.approval_token as string,
     createdAt: row.created_at as string,
     expiresAt: row.expires_at as string,
+    ...marketplaceFields(row),
   };
 }
 
@@ -57,6 +59,20 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+  const marketplaceType = typeFromParam(body.marketplaceType);
+  const isAsk = marketplaceType === "ask";
+
+  // Asks are free in V1 and skip the plan/salary rules; they need a headline,
+  // a description and a way to respond.
+  if (isAsk) {
+    body.tier = "free";
+    if (!String(body.title || "").trim() || !String(body.description || "").trim()) {
+      return NextResponse.json({ error: "Add a headline and a short description." }, { status: 400 });
+    }
+    if (!/^(https?:\/\/|mailto:)/i.test(String(body.externalApplyUrl || "").trim())) {
+      return NextResponse.json({ error: "Add a link or email address where people can respond." }, { status: 400 });
+    }
+  }
 
   // Paid plans can only post for free through this endpoint during the launch
   // promo, or when a valid referral code is supplied. Otherwise they must pay via
@@ -74,7 +90,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Enforce the tier's salary band server-side so the client check can't be bypassed.
-  const salaryError = validateSalaryForTier(
+  const salaryError = isAsk ? null : validateSalaryForTier(
     body.tier as Tier,
     Number(body.salaryMin) || 0,
     Number(body.salaryMax) || 0
@@ -86,14 +102,15 @@ export async function POST(req: NextRequest) {
   const now = new Date();
   const id = `job-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   const approvalToken = crypto.randomUUID();
-  const expiresAt = new Date(now.getTime() + EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  const days = isAsk ? ASK_EXPIRY_DAYS : EXPIRY_DAYS;
+  const expiresAt = new Date(now.getTime() + days * 24 * 60 * 60 * 1000).toISOString();
 
   // Record the referral code on the listing so past use is searchable in /admin.
   const referralCode = isValidReferralCode(body.referralCode)
     ? String(body.referralCode).trim()
     : "";
 
-  const row = {
+  const row: Record<string, unknown> = {
     id,
     poster_name: body.posterName,
     poster_email: body.posterEmail,
@@ -101,10 +118,10 @@ export async function POST(req: NextRequest) {
     company_logo: body.companyLogo || "",
     company_website: body.companyWebsite || "",
     title: body.title,
-    department: body.department,
-    location: body.location,
-    location_type: body.locationType,
-    role_level: body.roleLevel,
+    department: isAsk ? "Other" : body.department,
+    location: body.location || (isAsk ? "Anywhere" : ""),
+    location_type: body.locationType || "Remote",
+    role_level: isAsk ? "" : body.roleLevel,
     salary_min: body.salaryMin || 0,
     salary_max: body.salaryMax || 0,
     description: body.description,
@@ -118,6 +135,15 @@ export async function POST(req: NextRequest) {
     expires_at: expiresAt,
     referral_code: referralCode,
   };
+  // Only projects and asks write the new columns, so posting a job works the same
+  // whether or not supabase-marketplace.sql has been run yet.
+  if (marketplaceType !== "job") {
+    row.marketplace_type = marketplaceType;
+    if (isAsk) {
+      row.ask_type = isAskType(body.askType) ? body.askType : "other";
+      if (/^\d{4}-\d{2}-\d{2}$/.test(String(body.eventDate || ""))) row.event_date = body.eventDate;
+    }
+  }
 
   let { error } = await getSupabase().from("jobs").insert(row);
 
@@ -130,6 +156,12 @@ export async function POST(req: NextRequest) {
     ({ error } = await getSupabase().from("jobs").insert(rowWithoutCode));
   }
 
+  if (error && missingMarketplaceColumns(error.message)) {
+    return NextResponse.json(
+      { error: "Projects and Asks are almost ready. Email goodjobs@weareingoodco.com and we'll post it for you." },
+      { status: 503 }
+    );
+  }
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

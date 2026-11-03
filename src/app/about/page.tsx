@@ -124,7 +124,7 @@ export default function AboutPage() {
             href="/post"
             className="bg-accent text-black text-sm font-bold uppercase tracking-wider font-headline px-8 py-3 hover:bg-accent/90 transition-colors inline-block"
           >
-            Post a Job
+            + Post something
           </Link>
         </section>
       </div>

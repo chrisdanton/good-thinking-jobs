@@ -81,6 +81,18 @@ export default function AdminPage() {
     setBusyId(null);
   }
 
+  // Asks expire after 30 days; renewing puts one back up for another 30 from today.
+  async function handleRenew(id: string) {
+    setBusyId(id);
+    await fetch(`/api/admin/jobs`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: password, id, renewDays: 30 }),
+    });
+    await reload();
+    setBusyId(null);
+  }
+
   async function handleToggleNewsletter(id: string, current: boolean) {
     setBusyId(id);
     await fetch(`/api/admin/jobs`, {
@@ -227,7 +239,12 @@ export default function AdminPage() {
               <tbody>
                 {visibleJobs.map((job) => (
                   <tr key={job.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                    <td className="py-3 pr-4 font-medium max-w-[200px] truncate">{job.title}</td>
+                    <td className="py-3 pr-4 font-medium max-w-[200px] truncate">
+                      {job.marketplaceType && job.marketplaceType !== "job" && (
+                        <span className="mr-2 text-[10px] px-1.5 py-0.5 font-bold uppercase tracking-wider bg-white/10">{job.marketplaceType}</span>
+                      )}
+                      {job.title}
+                    </td>
                     <td className="py-3 pr-4 text-muted">
                       <div>{job.companyName}</div>
                       <div className="text-xs text-muted/70 truncate max-w-[180px]">{job.posterName} · {job.posterEmail}</div>
@@ -278,6 +295,16 @@ export default function AdminPage() {
                             className="text-xs text-red-400 hover:text-red-300 underline underline-offset-2 disabled:opacity-40"
                           >
                             Remove
+                          </button>
+                        )}
+                        {job.marketplaceType === "ask" && job.status === "active" && (
+                          <button
+                            onClick={() => handleRenew(job.id)}
+                            disabled={busyId === job.id}
+                            title={`Expires ${formatDate(job.expiresAt)}`}
+                            className="text-xs text-muted hover:text-white underline underline-offset-2 disabled:opacity-40"
+                          >
+                            Renew 30 days
                           </button>
                         )}
                         <button

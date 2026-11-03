@@ -1,3 +1,4 @@
+import { marketplaceFields } from "@/lib/marketplace";
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { Job, Department, LocationType, RoleLevel, Tier, JobStatus } from "@/lib/types";
@@ -28,6 +29,7 @@ function rowToJob(row: Record<string, unknown>): Job {
     approvalToken: row.approval_token as string,
     createdAt: row.created_at as string,
     expiresAt: row.expires_at as string,
+    ...marketplaceFields(row),
     referralCode: (row.referral_code as string) || "",
   };
 }
@@ -59,7 +61,8 @@ export async function GET(req: NextRequest) {
 // PATCH /api/admin/jobs — update a job's status, newsletter flag, or the common
 // quick-fix fields (company name, title, location, salary) used by the /fix page.
 // body: { key, id, status?, flaggedForNewsletter?, companyName?, title?,
-//         location?, locationType?, salaryMin?, salaryMax?, department?, roleLevel? }
+//         location?, locationType?, salaryMin?, salaryMax?, department?, roleLevel?,
+//         renewDays?, marketplaceType? }
 export async function PATCH(req: NextRequest) {
   const body = await req.json();
   if (!authorized(body.key)) {
@@ -96,6 +99,16 @@ export async function PATCH(req: NextRequest) {
   // Salary: a sent value wins, including 0 to clear it back to "not listed".
   if (body.salaryMin !== undefined) updates.salary_min = Math.max(0, Math.round(Number(body.salaryMin) || 0));
   if (body.salaryMax !== undefined) updates.salary_max = Math.max(0, Math.round(Number(body.salaryMax) || 0));
+
+  // Renew a listing (used for Asks, which expire after 30 days): live for N more days from today.
+  const renewDays = Number(body.renewDays);
+  if (Number.isFinite(renewDays) && renewDays > 0 && renewDays <= 365) {
+    updates.expires_at = new Date(Date.now() + renewDays * 24 * 60 * 60 * 1000).toISOString();
+  }
+  // Move a listing between Jobs / Projects / Asks (needs supabase-marketplace.sql).
+  if (body.marketplaceType === "job" || body.marketplaceType === "project" || body.marketplaceType === "ask") {
+    updates.marketplace_type = body.marketplaceType;
+  }
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });

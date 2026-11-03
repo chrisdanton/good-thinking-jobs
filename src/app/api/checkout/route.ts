@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   const approvalToken = crypto.randomUUID();
   const expiresAt = new Date(now.getTime() + EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-  const row = {
+  const row: Record<string, unknown> = {
     id,
     poster_name: body.posterName,
     poster_email: body.posterEmail,
@@ -49,6 +49,8 @@ export async function POST(req: NextRequest) {
     created_at: now.toISOString(),
     expires_at: expiresAt,
   };
+  // Paid projects carry their type; jobs leave the column alone (works before the SQL is run).
+  if (body.marketplaceType === "project") row.marketplace_type = "project";
 
   const { error } = await getSupabase().from("jobs").insert(row);
   if (error) {
