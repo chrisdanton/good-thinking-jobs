@@ -39,7 +39,7 @@ async function loadPassages(): Promise<void> {
   try {
     const res = await fetch(`${url}/storage/v1/object/good-index/passages.json`, {
       headers: { Authorization: `Bearer ${key}`, apikey: key },
-      next: { revalidate: 86400 },
+      cache: "no-store", // over Next's 2MB fetch-cache limit; kept in memory below instead
     });
     if (res.ok) PASSAGES = await res.json();
   } catch {}
