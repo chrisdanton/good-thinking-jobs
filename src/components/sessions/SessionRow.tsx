@@ -154,3 +154,45 @@ export function PastRow({ s }: { s: Session }) {
     </article>
   );
 }
+
+// Further-out upcoming sessions: one compact line each, so the page stays short.
+export function LaterRow({ s }: { s: Session }) {
+  return (
+    <article
+      style={{ borderTop: "2px solid #000" }}
+      className="grid grid-cols-[4.25rem_1fr] items-baseline gap-x-4 py-5 sm:grid-cols-[6rem_1fr_auto] sm:gap-x-8"
+    >
+      <p className="leading-none">
+        <span className="block text-[11px] font-bold uppercase tracking-[0.2em]">{s.tba ? "TBA" : monthLabel(s)}</span>
+        <span className="speaking-display mt-1.5 block text-4xl sm:text-5xl">{s.tba ? "" : dayLabel(s)}</span>
+      </p>
+      <div className="min-w-0">
+        <h3 className="speaking-display text-2xl sm:text-3xl break-words" style={{ lineHeight: 0.95 }}>
+          {s.title}
+        </h3>
+        {s.time && !s.tba && (
+          <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#555" }}>
+            <LocalTime iso={startDate(s).toISOString()} />
+          </p>
+        )}
+      </div>
+      <div className="col-start-2 mt-3 flex gap-4 text-xs font-bold uppercase tracking-wide sm:col-start-3 sm:mt-0">
+        {s.accessUrl && (
+          <a href={s.accessUrl} target="_blank" rel="noopener noreferrer" className="underline decoration-2 underline-offset-4">
+            Access
+          </a>
+        )}
+        {s.time && !s.tba && (
+          <a href={googleCalUrl(s)} target="_blank" rel="noopener noreferrer" className="underline decoration-2 underline-offset-4">
+            + Google
+          </a>
+        )}
+        {s.time && !s.tba && (
+          <a href={icsPath(s)} className="underline decoration-2 underline-offset-4">
+            + Apple
+          </a>
+        )}
+      </div>
+    </article>
+  );
+}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PastRow, UpcomingTile } from "@/components/sessions/SessionRow";
+import { LaterRow, PastRow, UpcomingTile } from "@/components/sessions/SessionRow";
 import { TimeZonePicker, TimeZoneProvider } from "@/components/sessions/TimeZone";
 import { pastSessions, upcomingSessions } from "@/lib/sessions";
 import { SpeakingFooter } from "../speaking/ui";
@@ -19,6 +19,8 @@ export const revalidate = 3600;
 
 const SUBSTACK = "https://ingoodco.substack.com";
 const Y = "#F9FF00";
+// How many upcoming sessions get the big poster tile; the rest go in the compact list.
+const NEXT_COUNT = 3;
 
 export default function SessionsPage() {
   const upcoming = upcomingSessions();
@@ -52,11 +54,22 @@ export default function SessionsPage() {
         <section aria-labelledby="upcoming" className="mx-auto max-w-6xl px-5 py-14 sm:px-10 sm:py-20">
           <h2 id="upcoming" className="speaking-display text-4xl sm:text-6xl">Coming up</h2>
           {upcoming.length ? (
-            <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-              {upcoming.map((s, i) => (
-                <UpcomingTile key={s.slug} s={s} index={i} />
-              ))}
-            </div>
+            <>
+              <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                {upcoming.slice(0, NEXT_COUNT).map((s, i) => (
+                  <UpcomingTile key={s.slug} s={s} index={i} />
+                ))}
+              </div>
+              {upcoming.length > NEXT_COUNT && (
+                <div className="mt-16 sm:mt-20">
+                  <h3 className="pb-4 text-[11px] font-bold uppercase tracking-[0.3em]">Later</h3>
+                  {upcoming.slice(NEXT_COUNT).map((s) => (
+                    <LaterRow key={s.slug} s={s} />
+                  ))}
+                  <div style={{ borderTop: "2px solid #000" }} />
+                </div>
+              )}
+            </>
           ) : (
             <p className="mt-6 text-lg">
               Next session coming soon. Paid members hear first.{" "}
