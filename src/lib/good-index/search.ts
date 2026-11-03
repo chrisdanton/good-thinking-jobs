@@ -10,7 +10,7 @@
 //
 // The search layer is swappable: `engine` below is a plain keyword (BM25) ranker over
 // those passages. To connect a semantic/vector search later, write
-// another object with the same `search()` shape and assign it to `engine`. Pages
+// another object with the same `search()` shape and pass it to `setSearchEngine()`. Pages
 // don't need to change.
 import { promises as fs } from "fs";
 import path from "path";
@@ -136,7 +136,12 @@ const keywordEngine: ArchiveSearch = {
   },
 };
 
-export let engine: ArchiveSearch = keywordEngine;
+let engine: ArchiveSearch = keywordEngine;
+
+// Plug in a different search layer (e.g. semantic/vector) without touching pages.
+export function setSearchEngine(next: ArchiveSearch) {
+  engine = next;
+}
 
 // ── What pages call ──
 export async function searchArchive(query: string, limit = 12): Promise<Passage[]> {

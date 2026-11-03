@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { IndexShell, Timeline } from "@/components/good-index/ui";
 import { SIGNS, getSign, relatedTo } from "@/lib/good-index/search";
 
+// Re-check related passages daily (picks up new letters once the archive is connected).
+export const revalidate = 86400;
+
 export function generateStaticParams() {
   return SIGNS.map((s) => ({ slug: s.slug }));
 }

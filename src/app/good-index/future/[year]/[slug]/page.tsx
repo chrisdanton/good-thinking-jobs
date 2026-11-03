@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { IndexShell, Timeline } from "@/components/good-index/ui";
 import { FUTURE, getPrediction, relatedTo } from "@/lib/good-index/search";
 
+// Re-check related passages daily (picks up new letters once the archive is connected).
+export const revalidate = 86400;
+
 export function generateStaticParams() {
   return Object.entries(FUTURE).flatMap(([year, preds]) => preds.map((p) => ({ year, slug: p.slug })));
 }
