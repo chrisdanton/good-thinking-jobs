@@ -37,7 +37,7 @@ export const SESSIONS: Session[] = [
     date: "2026-12-10",
     time: "12:00",
     timezone: "America/New_York",
-    description: "How brands can show up on Substack, and who's already doing it well.",
+    description: "How brands can show up on Substack, and who's already doing it well. Not a “how-to” but a “what good looks like.”",
     guest: "Chris + Kirsten",
     accessUrl: "", // paste the paid-only Substack link here
     status: "upcoming",
