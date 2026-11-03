@@ -44,7 +44,7 @@ export const SESSIONS: Session[] = [
   },
   {
     slug: "good-trends-q1-27",
-    title: "GOOD TRENDS Q1 '27: GOOD FUTURE, ask us anything",
+    title: "GOOD FUTURE '27: Ask us anything",
     date: "2027-01-12",
     time: "12:00",
     timezone: "America/New_York",

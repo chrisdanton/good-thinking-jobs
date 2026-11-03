@@ -45,16 +45,13 @@ export function UpcomingTile({ s, index }: { s: Session; index: number }) {
       className="relative border-[1.5px] border-black p-6 sm:p-8"
       style={{ background: st.bg, color: st.fg, transform: `rotate(${st.tilt}deg)`, boxShadow: "6px 6px 0 0 #000" }}
     >
-      <div className="flex items-start justify-between gap-4">
-        <Chip dark={st.dark}>{s.tba ? "Date TBA" : monthLabel(s)}</Chip>
-        <span className="pt-1 text-right text-[10px] font-bold uppercase tracking-[0.25em]">Paid members</span>
-      </div>
+      <Chip dark={st.dark}>{s.tba ? "Date TBA" : monthLabel(s)}</Chip>
 
-      <p className="speaking-display mt-6 text-[7.5rem] sm:text-[9rem]" style={{ lineHeight: 0.8 }}>
+      <p className="speaking-display mt-9 text-[7.5rem] sm:text-[9rem]" style={{ lineHeight: 0.8 }}>
         {s.tba ? "TBA" : dayLabel(s)}
       </p>
 
-      <div className="mt-4">
+      <div className="mt-8">
         {s.tba ? (
           <Chip dark={st.dark}>{s.tba}</Chip>
         ) : (
@@ -71,6 +68,7 @@ export function UpcomingTile({ s, index }: { s: Session; index: number }) {
       </h3>
       <p className="mt-3 text-[15px] leading-relaxed">{s.description}</p>
       {meta && <p className="mt-2 text-xs font-bold uppercase tracking-[0.15em] opacity-70">{meta}</p>}
+      <p className="mt-2 text-xs font-bold uppercase tracking-[0.15em]">Paid GOOD THINKING member perk</p>
 
       {(s.accessUrl || (!s.tba && s.time)) && (
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">

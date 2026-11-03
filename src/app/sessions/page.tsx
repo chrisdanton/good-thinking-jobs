@@ -114,19 +114,35 @@ export default function SessionsPage() {
           </section>
         )}
 
-        {/* Membership note */}
-        <div style={{ background: Y, color: "#000" }} className="border-y-2 border-black">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-10">
-            <p className="speaking-display text-2xl sm:text-3xl">Included with a paid GOOD THINKING membership</p>
-            <a
-              href={SUBSTACK}
-              className="inline-block self-start border-[1.5px] px-6 py-3 text-sm font-bold uppercase tracking-wide sm:self-auto"
-              style={{ background: "#000", color: "#fff", borderColor: "#000" }}
-            >
-              Become a member
-            </a>
+        {/* Subscribe: same look as the weareingoodco.com footer. Sends people to
+            Substack's own subscribe page (email pre-filled) where they pick a plan. */}
+        <section style={{ background: "#000", color: "#fff" }}>
+          <div className="mx-auto max-w-6xl px-5 py-14 sm:px-10 sm:py-16">
+            <form action={`${SUBSTACK}/subscribe`} method="get" target="_blank" className="max-w-md">
+              <label htmlFor="gs-email" className="block font-mono text-sm uppercase tracking-[0.08em] sm:text-base">
+                Get GOOD THINKING + GOOD SESSIONS:
+              </label>
+              <div className="mt-4 flex" style={{ border: `1.5px solid ${Y}` }}>
+                <input
+                  id="gs-email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="Enter your email"
+                  className="min-w-0 flex-1 px-4 py-3 text-base outline-none"
+                  style={{ background: "#000", color: "#fff", border: 0, borderRadius: 0 }}
+                />
+                <button
+                  type="submit"
+                  className="px-5 py-3 text-sm font-bold"
+                  style={{ background: Y, color: "#000", border: 0, borderRadius: 0 }}
+                >
+                  Subscribe
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
+        </section>
         <SpeakingFooter />
       </div>
     </TimeZoneProvider>
