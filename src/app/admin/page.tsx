@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Job, Application } from "@/lib/types";
 import CuratePanel from "@/components/CuratePanel";
+import EmployerFeedsPanel from "@/components/EmployerFeedsPanel";
 
 function formatSalary(min: number, max: number): string {
   if (!min && !max) return "Not listed";
@@ -20,7 +21,7 @@ export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [tab, setTab] = useState<"jobs" | "curate" | "newsletter">("jobs");
+  const [tab, setTab] = useState<"jobs" | "curate" | "feeds" | "newsletter">("jobs");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [copied, setCopied] = useState(false);
@@ -181,7 +182,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 mb-8 border-b border-white/10">
-        {(["jobs", "curate", "newsletter"] as const).map((t) => (
+        {(["jobs", "curate", "feeds", "newsletter"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -189,7 +190,7 @@ export default function AdminPage() {
               tab === t ? "border-accent text-accent" : "border-transparent text-muted hover:text-white"
             }`}
           >
-            {t === "jobs" ? `All Postings (${jobs.length})` : t === "curate" ? "Add from Link" : "Newsletter Digest"}
+            {t === "jobs" ? `All Postings (${jobs.length})` : t === "curate" ? "Add from Link" : t === "feeds" ? "Employer Feeds" : "Newsletter Digest"}
           </button>
         ))}
       </div>
@@ -370,6 +371,7 @@ export default function AdminPage() {
 
       {/* Curate Tab */}
       {tab === "curate" && <CuratePanel password={password} onPosted={reload} />}
+      {tab === "feeds" && <EmployerFeedsPanel password={password} />}
 
       {/* Newsletter Tab */}
       {tab === "newsletter" && (

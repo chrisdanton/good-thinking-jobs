@@ -100,6 +100,9 @@ export async function PATCH(req: NextRequest) {
   if (body.salaryMin !== undefined) updates.salary_min = Math.max(0, Math.round(Number(body.salaryMin) || 0));
   if (body.salaryMax !== undefined) updates.salary_max = Math.max(0, Math.round(Number(body.salaryMax) || 0));
 
+  // Editing an imported role's title/location/category: keep the edit through future syncs.
+  if (body.manualOverride === true) updates.manual_override = true;
+
   // Renew a listing (used for Asks, which expire after 30 days): live for N more days from today.
   const renewDays = Number(body.renewDays);
   if (Number.isFinite(renewDays) && renewDays > 0 && renewDays <= 365) {
