@@ -6,10 +6,10 @@ import { SpeakingFooter } from "../speaking/ui";
 
 export const metadata: Metadata = {
   title: "GOOD SESSIONS · GOOD THINKING",
-  description: "Conversations, briefings and occasional deep dives for GOOD THINKING paid members.",
+  description: "Masterclasses, LIVE sessions, unfiltered conversations that are best for behind a paywall.",
   openGraph: {
     title: "GOOD SESSIONS · GOOD THINKING",
-    description: "Conversations, briefings and occasional deep dives for GOOD THINKING paid members.",
+    description: "Masterclasses, LIVE sessions, unfiltered conversations that are best for behind a paywall.",
     type: "website",
   },
 };
@@ -39,7 +39,7 @@ export default function SessionsPage() {
             </h1>
             <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
               <p className="max-w-md text-lg leading-snug sm:text-xl">
-                Conversations, briefings and occasional deep dives for GOOD THINKING paid members.
+                Masterclasses, LIVE sessions, unfiltered conversations that are best for behind a paywall.
               </p>
               <TimeZonePicker />
             </div>
