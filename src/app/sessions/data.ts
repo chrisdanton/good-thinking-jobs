@@ -12,7 +12,8 @@
 //   slug         short id, lowercase-with-dashes, must be unique
 //   title        the session title
 //   date         "YYYY-MM-DD"
-//   time         24-hour "HH:MM" in the timezone below, e.g. "12:00" or "16:30"
+//   time         24-hour "HH:MM" in the timezone below. Standard slot: "12:00"
+//                (9am PT / 12pm ET / 6pm Central Europe)
 //   timezone     usually "America/New_York"
 //   description  one short sentence
 //   guest        optional, e.g. "Chris + Kirsten" or "with Jane Doe"
@@ -34,7 +35,7 @@ export const SESSIONS: Session[] = [
     slug: "substack-for-brands",
     title: "Substack for brands",
     date: "2026-12-10",
-    time: "", // add start time, e.g. "12:00" (New York time)
+    time: "12:00",
     timezone: "America/New_York",
     description: "How brands can show up on Substack, and who's already doing it well.",
     guest: "Chris + Kirsten",
@@ -45,7 +46,7 @@ export const SESSIONS: Session[] = [
     slug: "good-future-ask-us-anything",
     title: "GOOD FUTURE: Ask us anything",
     date: "2027-01-12",
-    time: "", // add start time, e.g. "12:00" (New York time)
+    time: "12:00",
     timezone: "America/New_York",
     accessUrl: "", // paste the paid-only Substack link here
     description: "Bring your questions about the 2027 predictions. We'll answer them live.",
