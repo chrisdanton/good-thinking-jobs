@@ -128,11 +128,8 @@ export function icsPath(s: Session) {
 
 const icsEscape = (t: string) => t.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
 
-export function icsFile(s: Session) {
+function icsEvent(s: Session) {
   return [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//GOOD THINKING//GOOD SESSIONS//EN",
     "BEGIN:VEVENT",
     `UID:${s.slug}@getgoodthinking.com`,
     `DTSTAMP:${icsStamp(new Date())}`,
@@ -142,7 +139,39 @@ export function icsFile(s: Session) {
     `DESCRIPTION:${icsEscape(details(s))}`,
     `URL:${s.accessUrl || `${SITE_URL}/sessions`}`,
     "END:VEVENT",
+  ];
+}
+
+function icsWrap(events: string[][], name?: string) {
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//GOOD THINKING//GOOD SESSIONS//EN",
+    "CALSCALE:GREGORIAN",
+    ...(name ? [`X-WR-CALNAME:${name}`, "X-PUBLISHED-TTL:PT12H", "REFRESH-INTERVAL;VALUE=DURATION:PT12H"] : []),
+    ...events.flat(),
     "END:VCALENDAR",
     "",
   ].join("\r\n");
 }
+
+// One session (the "Apple" add-to-calendar link).
+export function icsFile(s: Session) {
+  return icsWrap([icsEvent(s)]);
+}
+
+// The subscribable calendar: every dated session, past and upcoming. Calendar apps
+// re-check it every few hours, so new sessions appear on their own.
+export function icsFeed() {
+  const dated = SESSIONS.filter((s) => !s.tba && s.time);
+  return icsWrap(dated.map(icsEvent), "GOOD SESSIONS");
+}
+
+export const FEED_PATH = "/sessions/calendar.ics";
+const FEED_HTTPS = `${SITE_URL}${FEED_PATH}`;
+const FEED_WEBCAL = FEED_HTTPS.replace(/^https:/, "webcal:");
+export const SUBSCRIBE = {
+  apple: FEED_WEBCAL,
+  google: `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(FEED_WEBCAL)}`,
+  outlook: `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(FEED_HTTPS)}&name=${encodeURIComponent("GOOD SESSIONS")}`,
+};

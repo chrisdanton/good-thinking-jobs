@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LaterRow, PastRow, UpcomingTile } from "@/components/sessions/SessionRow";
 import { TimeZonePicker, TimeZoneProvider } from "@/components/sessions/TimeZone";
-import { pastSessions, upcomingSessions } from "@/lib/sessions";
+import { SUBSCRIBE, pastSessions, upcomingSessions } from "@/lib/sessions";
 import { SpeakingFooter } from "../speaking/ui";
 
 export const metadata: Metadata = {
@@ -47,6 +47,28 @@ export default function SessionsPage() {
               </p>
               <TimeZonePicker />
             </div>
+            {/* Subscribe once: every session lands in your calendar, new ones included. */}
+            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 border-t-2 border-black pt-5">
+              <span className="text-[11px] font-bold uppercase tracking-[0.25em]">Subscribe to the calendar</span>
+              <span className="flex flex-wrap gap-2">
+                {([
+                  ["Google", SUBSCRIBE.google],
+                  ["Apple", SUBSCRIBE.apple],
+                  ["Outlook", SUBSCRIBE.outlook],
+                ] as const).map(([label, href]) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target={label === "Apple" ? undefined : "_blank"}
+                    rel="noopener noreferrer"
+                    className="inline-block border-[1.5px] px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.12em]"
+                    style={{ background: "#000", color: "#fff", borderColor: "#000" }}
+                  >
+                    + {label}
+                  </a>
+                ))}
+              </span>
+            </div>
           </div>
         </header>
 
@@ -85,7 +107,7 @@ export default function SessionsPage() {
               <div className="flex items-end justify-between pb-6">
                 <h2 id="past" className="speaking-display text-4xl sm:text-6xl">Past sessions</h2>
                 <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: Y }}>
-                  Replays for members
+                  Replays on Substack, for members
                 </span>
               </div>
               {past.map((s) => (

@@ -74,28 +74,30 @@ export function UpcomingTile({ s, index }: { s: Session; index: number }) {
 
       {(s.accessUrl || (!s.tba && s.time)) && (
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-          {s.accessUrl && (
-            <a
-              href={s.accessUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block border-[1.5px] px-5 py-3 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5"
-              style={btn}
-            >
-              Access session
-            </a>
-          )}
           {!s.tba && s.time && (
-            <details className="text-sm">
-              <summary className="cursor-pointer list-none font-bold uppercase tracking-wide underline decoration-2 underline-offset-4">
-                + Calendar
+            <details className="relative">
+              <summary
+                className="inline-block cursor-pointer list-none border-[1.5px] px-5 py-3 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5"
+                style={btn}
+              >
+                + Add to calendar
               </summary>
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 font-semibold">
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
                 <a href={googleCalUrl(s)} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Google</a>
                 <a href={icsPath(s)} className="underline underline-offset-4">Apple</a>
                 <a href={outlookCalUrl(s)} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Outlook</a>
               </div>
             </details>
+          )}
+          {s.accessUrl && (
+            <a
+              href={s.accessUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-bold uppercase tracking-wide underline decoration-2 underline-offset-4"
+            >
+              Join on Substack →
+            </a>
           )}
         </div>
       )}
@@ -142,7 +144,7 @@ export function PastRow({ s }: { s: Session }) {
               className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-[0.15em]"
               style={{ background: Y, color: "#000" }}
             >
-              Watch session →
+              Watch on Substack →
             </a>
           ) : (
             <span className="text-xs font-bold uppercase tracking-[0.15em]" style={{ color: "#888" }}>

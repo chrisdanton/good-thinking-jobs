@@ -31,3 +31,13 @@ describe("sessions", () => {
     expect(icsFile(s)).toContain("DTSTART:20261119T170000Z");
   });
 });
+
+describe("calendar feed", () => {
+  it("lists every dated session in one subscribable calendar", async () => {
+    const { icsFeed } = await import("./sessions");
+    const feed = icsFeed();
+    expect(feed).toContain("X-WR-CALNAME:GOOD SESSIONS");
+    expect(feed.match(/BEGIN:VEVENT/g)!.length).toBeGreaterThan(3);
+    expect(feed).toContain("DTSTART:20261210T170000Z"); // Substack for brands, 12pm ET
+  });
+});
