@@ -26,18 +26,40 @@
 
 import type { Session } from "@/lib/sessions";
 
+//   tba          optional: use instead of a firm date when it isn't set yet,
+//                e.g. "Early 2027". Put a rough date in `date` so it sorts.
+
 export const SESSIONS: Session[] = [
   {
-    slug: "ai-shopping",
-    title: "What we're getting wrong about AI shopping",
-    date: "2026-11-19",
+    slug: "good-future-ask-us-anything",
+    title: "GOOD FUTURE: Ask us anything",
+    date: "2027-01-31",
+    tba: "Early 2027",
+    description: "Bring your questions about the 2027 predictions. We'll answer them live.",
+    guest: "Chris + Kirsten",
+    status: "upcoming",
+  },
+  {
+    slug: "the-new-world-of-pr",
+    title: "The new world of PR",
+    date: "2026-10-29",
     time: "12:00",
     timezone: "America/New_York",
-    description: "A 30-minute conversation about where AI commerce is actually going.",
+    description: "How media, attention and PR actually work now, and what brands should do about it.",
     guest: "Chris + Kirsten",
-    duration: 30,
-    accessUrl: "https://ingoodco.substack.com", // TODO: replace with the paid-only Substack link
-    status: "upcoming",
-    featured: true,
+    image: "/sessions/good-pr.jpg",
+    replayUrl: "", // paste the edited replay link here once it's posted
+    status: "past",
+  },
+  {
+    slug: "good-trends-q4-26",
+    title: "GOOD TRENDS Q4 '26",
+    date: "2026-09-10",
+    description: "The quarterly read on what's shifting across culture, retail, tech, wellness and more.",
+    guest: "Chris + Kirsten",
+    duration: 55,
+    image: "/sessions/good-trends-q4-26.jpg",
+    replayUrl: "https://youtu.be/9VpcXxThvTs",
+    status: "past",
   },
 ];

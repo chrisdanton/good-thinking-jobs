@@ -16,6 +16,7 @@ export type Session = {
   replayUrl?: string;
   status: "upcoming" | "past";
   featured?: boolean;
+  tba?: string; // e.g. "Early 2027": shown instead of the date until one is set
 };
 
 export const SITE_URL = "https://getgoodthinking.com";
@@ -47,6 +48,7 @@ export function endDate(s: Session): Date {
 // A session is past if marked so, or once it ended more than a day ago.
 export function isPast(s: Session, now = new Date()): boolean {
   if (s.status === "past") return true;
+  if (s.tba) return false;
   return endDate(s).getTime() + 24 * 3600_000 < now.getTime();
 }
 
@@ -61,7 +63,7 @@ export function pastSessions(now = new Date()): Session[] {
 // Featured upcoming session first, otherwise the soonest.
 export function nextSession(now = new Date()): Session | undefined {
   const up = upcomingSessions(now);
-  return up.find((s) => s.featured) || up[0];
+  return up.find((s) => s.featured) || up.find((s) => !s.tba) || up[0];
 }
 
 export function getSession(slug: string): Session | undefined {

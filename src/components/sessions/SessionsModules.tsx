@@ -12,7 +12,7 @@ export function SessionsNextUp() {
         <p className="mt-3 text-xl sm:text-2xl leading-snug">
           <span className="font-bold">Next up:</span> {s.title}{" "}
           <span className="whitespace-nowrap font-bold">
-            {monthLabel(s)} {dayLabel(s)}
+            {s.tba || `${monthLabel(s)} ${dayLabel(s)}`}
           </span>
         </p>
       ) : (

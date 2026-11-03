@@ -14,17 +14,24 @@ import {
 const YELLOW = "#F9FF00";
 
 export default function SessionRow({ s, past = false }: { s: Session; past?: boolean }) {
-  const meta = [s.guest, s.duration ? `${s.duration} minutes` : "", past ? "" : timeLabel(s)].filter(Boolean);
+  const meta = [s.guest, s.duration ? `${s.duration} minutes` : "", past || s.tba ? "" : timeLabel(s)].filter(Boolean);
   const href = past ? s.replayUrl || s.accessUrl : s.accessUrl;
 
   return (
     <article className="grid grid-cols-[4.5rem_1fr] gap-x-5 border-t-2 border-black py-10 sm:grid-cols-[8rem_1fr] sm:gap-x-10 sm:py-14 md:grid-cols-[8rem_1fr_14rem]">
       {/* Date */}
-      <div className="leading-none">
-        <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em]">{monthLabel(s)}</p>
-        <p className={`speaking-display mt-1 ${past ? "text-5xl sm:text-7xl" : "text-6xl sm:text-8xl"}`}>{dayLabel(s)}</p>
-        {past && <p className="mt-2 text-xs font-bold tracking-[0.2em]">{yearLabel(s)}</p>}
-      </div>
+      {s.tba ? (
+        <div className="leading-none">
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em]">Date TBA</p>
+          <p className="speaking-display mt-2 text-2xl sm:text-4xl">{s.tba}</p>
+        </div>
+      ) : (
+        <div className="leading-none">
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em]">{monthLabel(s)}</p>
+          <p className={`speaking-display mt-1 ${past ? "text-5xl sm:text-7xl" : "text-6xl sm:text-8xl"}`}>{dayLabel(s)}</p>
+          {past && <p className="mt-2 text-xs font-bold tracking-[0.2em]">{yearLabel(s)}</p>}
+        </div>
+      )}
 
       {/* Details */}
       <div className="min-w-0">
@@ -55,7 +62,10 @@ export default function SessionRow({ s, past = false }: { s: Session; past?: boo
               {past ? "Watch session" : "Access session"}
             </a>
           )}
-          {!past && (
+          {past && !href && (
+            <p className="text-sm font-bold uppercase tracking-wide" style={{ color: "#555" }}>Replay coming soon</p>
+          )}
+          {!past && !s.tba && (
             <details className="group text-sm">
               <summary className="cursor-pointer list-none font-bold uppercase tracking-wide underline decoration-2 underline-offset-4">
                 Add to calendar
@@ -74,7 +84,7 @@ export default function SessionRow({ s, past = false }: { s: Session; past?: boo
       {s.image && (
         <div className="hidden md:block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={s.image} alt="" className="aspect-[4/5] w-full border-[1.5px] border-black object-cover" />
+          <img src={s.image} alt="" className="aspect-video w-full border-[1.5px] border-black object-cover" />
         </div>
       )}
     </article>
