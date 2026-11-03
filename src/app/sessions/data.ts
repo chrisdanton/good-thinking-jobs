@@ -31,6 +31,17 @@ import type { Session } from "@/lib/sessions";
 
 export const SESSIONS: Session[] = [
   {
+    slug: "substack-for-brands",
+    title: "Substack for brands",
+    date: "2026-12-10",
+    time: "", // add start time, e.g. "12:00" (New York time)
+    timezone: "America/New_York",
+    description: "How brands can show up on Substack, and who's already doing it well.",
+    guest: "Chris + Kirsten",
+    accessUrl: "", // paste the paid-only Substack link here
+    status: "upcoming",
+  },
+  {
     slug: "good-future-ask-us-anything",
     title: "GOOD FUTURE: Ask us anything",
     date: "2027-01-31",

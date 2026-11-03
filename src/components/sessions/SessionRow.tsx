@@ -72,7 +72,7 @@ export function UpcomingTile({ s, index }: { s: Session; index: number }) {
       <p className="mt-3 text-[15px] leading-relaxed">{s.description}</p>
       {meta && <p className="mt-2 text-xs font-bold uppercase tracking-[0.15em] opacity-70">{meta}</p>}
 
-      {(s.accessUrl || !s.tba) && (
+      {(s.accessUrl || (!s.tba && s.time)) && (
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
           {s.accessUrl && (
             <a
@@ -85,7 +85,7 @@ export function UpcomingTile({ s, index }: { s: Session; index: number }) {
               Access session
             </a>
           )}
-          {!s.tba && (
+          {!s.tba && s.time && (
             <details className="text-sm">
               <summary className="cursor-pointer list-none font-bold uppercase tracking-wide underline decoration-2 underline-offset-4">
                 + Calendar
