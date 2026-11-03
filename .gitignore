@@ -40,3 +40,4 @@ email-previews/
 
 # GOOD INDEX letter passages: mostly paid letters, never commit (public repo)
 src/data/good-index/passages.json
+scripts/good-index.log
