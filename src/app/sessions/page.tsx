@@ -32,11 +32,7 @@ export default function SessionsPage() {
         {/* Poster masthead */}
         <header style={{ background: Y, color: "#000" }} className="border-b-2 border-black">
           <div className="mx-auto max-w-6xl px-5 pb-10 pt-8 sm:px-10 sm:pb-14 sm:pt-10">
-            <div className="flex justify-between border-b-2 border-black pb-3 text-[11px] font-bold uppercase tracking-[0.25em]">
-              <span>GOOD THINKING</span>
-              <span>Paid member programming</span>
-            </div>
-            <h1 className="speaking-display mt-6 text-[25vw] sm:text-[11rem] lg:text-[13rem]" style={{ lineHeight: 0.82 }}>
+            <h1 className="speaking-display mt-4 text-[25vw] sm:text-[11rem] lg:text-[13rem]" style={{ lineHeight: 0.82 }}>
               Good
               <br />
               Sessions
