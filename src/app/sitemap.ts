@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/speaking`, changeFrequency: "monthly", priority: 1 },
     { url: `${BASE}/speaking/press-kit`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/jobs`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE}/sessions`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE}/post`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/about`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/futures`, changeFrequency: "yearly", priority: 0.7 },
