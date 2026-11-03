@@ -142,7 +142,7 @@ export function PastRow({ s }: { s: Session }) {
               className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-[0.15em]"
               style={{ background: Y, color: "#000" }}
             >
-              Watch on Substack →
+              Watch
             </a>
           ) : (
             <span className="text-xs font-bold uppercase tracking-[0.15em]" style={{ color: "#888" }}>
