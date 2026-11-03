@@ -77,7 +77,7 @@ export const SESSIONS: Session[] = [
   },
   {
     slug: "fractional-leadership",
-    title: "Fractional leadership",
+    title: "Fractional leadership: advice from the inside",
     date: "2027-04-15", // proposed date
     time: "12:00",
     timezone: "America/New_York",
