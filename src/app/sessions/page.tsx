@@ -120,7 +120,7 @@ export default function SessionsPage() {
           <div className="mx-auto max-w-6xl px-5 py-14 sm:px-10 sm:py-16">
             <form action={`${SUBSTACK}/subscribe`} method="get" target="_blank" className="max-w-md">
               <label htmlFor="gs-email" className="block font-mono text-sm uppercase tracking-[0.08em] sm:text-base">
-                Get GOOD THINKING + GOOD SESSIONS:
+                Get GOOD THINKING:
               </label>
               <div className="mt-4 flex" style={{ border: `1.5px solid ${Y}` }}>
                 <input
