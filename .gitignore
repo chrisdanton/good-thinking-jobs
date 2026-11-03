@@ -37,3 +37,6 @@ next-env.d.ts
 
 # scratch email design previews (not part of the app)
 email-previews/
+
+# GOOD INDEX letter passages: mostly paid letters, never commit (public repo)
+src/data/good-index/passages.json
