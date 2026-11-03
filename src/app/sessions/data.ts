@@ -44,8 +44,10 @@ export const SESSIONS: Session[] = [
   {
     slug: "good-future-ask-us-anything",
     title: "GOOD FUTURE: Ask us anything",
-    date: "2027-01-31",
-    tba: "Early 2027",
+    date: "2027-01-12",
+    time: "", // add start time, e.g. "12:00" (New York time)
+    timezone: "America/New_York",
+    accessUrl: "", // paste the paid-only Substack link here
     description: "Bring your questions about the 2027 predictions. We'll answer them live.",
     guest: "Chris + Kirsten",
     status: "upcoming",
