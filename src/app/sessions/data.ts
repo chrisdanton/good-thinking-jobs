@@ -59,7 +59,7 @@ export const SESSIONS: Session[] = [
     guest: "Chris + Kirsten",
     duration: 55,
     image: "/sessions/good-trends-q4-26.jpg",
-    replayUrl: "https://youtu.be/9VpcXxThvTs",
+    replayUrl: "https://ingoodco.substack.com/perks/ad0abf74-664b-41d1-80d1-cc3b292472d5",
     status: "past",
   },
 ];
