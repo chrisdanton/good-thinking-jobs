@@ -1,5 +1,7 @@
-// One GOOD SESSION as a row in a programming-calendar list: a big date on the
-// left, title and details on the right. Used for both Upcoming and Past.
+// GOOD SESSIONS listings, styled like a gig poster.
+//   UpcomingTile: a big tilted color block with a huge date, the time in a black label.
+//   PastRow:      a compact line in a dark listing, like a venue's weekly schedule.
+import type { CSSProperties } from "react";
 import type { Session } from "@/lib/sessions";
 import {
   dayLabel,
@@ -7,70 +9,88 @@ import {
   icsPath,
   monthLabel,
   outlookCalUrl,
-  timeLabel,
+  startDate,
   yearLabel,
 } from "@/lib/sessions";
+import { LocalTime } from "./TimeZone";
 
-const YELLOW = "#F9FF00";
+const Y = "#F9FF00";
 
-export default function SessionRow({ s, past = false }: { s: Session; past?: boolean }) {
-  const meta = [s.guest, s.duration ? `${s.duration} minutes` : "", past || s.tba ? "" : timeLabel(s)].filter(Boolean);
-  const href = past ? s.replayUrl || s.accessUrl : s.accessUrl;
+const TILE_STYLES = [
+  { bg: Y, fg: "#000", tilt: -1.25, dark: false },
+  { bg: "#000", fg: "#fff", tilt: 1, dark: true },
+  { bg: "#fff", fg: "#000", tilt: -0.75, dark: false },
+];
+
+function Chip({ children, dark }: { children: React.ReactNode; dark?: boolean }) {
+  return (
+    <span
+      className="inline-block px-2.5 py-1 text-[13px] sm:text-sm font-bold uppercase tracking-[0.12em]"
+      style={dark ? { background: Y, color: "#000" } : { background: "#000", color: "#fff" }}
+    >
+      {children}
+    </span>
+  );
+}
+
+export function UpcomingTile({ s, index }: { s: Session; index: number }) {
+  const st = TILE_STYLES[index % TILE_STYLES.length];
+  const meta = [s.guest, s.duration ? `${s.duration} min` : ""].filter(Boolean).join(" · ");
+  const btn: CSSProperties = st.dark
+    ? { background: Y, color: "#000", borderColor: Y }
+    : { background: "#000", color: "#fff", borderColor: "#000" };
 
   return (
-    <article className="grid grid-cols-[4.5rem_1fr] gap-x-5 border-t-2 border-black py-10 sm:grid-cols-[8rem_1fr] sm:gap-x-10 sm:py-14 md:grid-cols-[8rem_1fr_14rem]">
-      {/* Date */}
-      {s.tba ? (
-        <div className="leading-none">
-          <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em]">Date TBA</p>
-          <p className="speaking-display mt-2 text-2xl sm:text-4xl">{s.tba}</p>
-        </div>
-      ) : (
-        <div className="leading-none">
-          <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em]">{monthLabel(s)}</p>
-          <p className={`speaking-display mt-1 ${past ? "text-5xl sm:text-7xl" : "text-6xl sm:text-8xl"}`}>{dayLabel(s)}</p>
-          {past && <p className="mt-2 text-xs font-bold tracking-[0.2em]">{yearLabel(s)}</p>}
-        </div>
-      )}
+    <article
+      className="relative border-[1.5px] border-black p-6 sm:p-8"
+      style={{ background: st.bg, color: st.fg, transform: `rotate(${st.tilt}deg)`, boxShadow: "6px 6px 0 0 #000" }}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <Chip dark={st.dark}>{s.tba ? "Date TBA" : monthLabel(s)}</Chip>
+        <span className="pt-1 text-right text-[10px] font-bold uppercase tracking-[0.25em]">Paid members</span>
+      </div>
 
-      {/* Details */}
-      <div className="min-w-0">
-        <p className="text-[11px] font-bold uppercase tracking-[0.3em]">
-          <span className="px-1.5 py-0.5" style={past ? undefined : { background: YELLOW }}>
-            Paid member session
-          </span>
-        </p>
-        <h3 className={`speaking-display mt-4 break-words ${past ? "text-3xl sm:text-4xl" : "text-[2.1rem] sm:text-5xl"}`}>
-          {s.title}
-        </h3>
-        <p className="mt-4 max-w-xl text-base sm:text-lg leading-relaxed">{s.description}</p>
-        {meta.length > 0 && (
-          <p className="mt-3 text-sm font-semibold" style={{ color: "#555" }}>
-            {meta.join(" · ")}
-          </p>
+      <p className="speaking-display mt-6 text-[7.5rem] sm:text-[9rem]" style={{ lineHeight: 0.8 }}>
+        {s.tba ? "TBA" : dayLabel(s)}
+      </p>
+
+      <div className="mt-4">
+        {s.tba ? (
+          <Chip dark={st.dark}>{s.tba}</Chip>
+        ) : (
+          s.time && (
+            <Chip dark={st.dark}>
+              <LocalTime iso={startDate(s).toISOString()} />
+            </Chip>
+          )
         )}
+      </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
-          {href && (
+      <h3 className="speaking-display mt-5 text-[2rem] sm:text-[2.5rem] break-words" style={{ lineHeight: 0.92 }}>
+        {s.title}
+      </h3>
+      <p className="mt-3 text-[15px] leading-relaxed">{s.description}</p>
+      {meta && <p className="mt-2 text-xs font-bold uppercase tracking-[0.15em] opacity-70">{meta}</p>}
+
+      {(s.accessUrl || !s.tba) && (
+        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+          {s.accessUrl && (
             <a
-              href={href}
+              href={s.accessUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block border-[1.5px] border-black px-6 py-3 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5"
-              style={past ? { background: "transparent", color: "#000" } : { background: "#000", color: "#fff" }}
+              className="inline-block border-[1.5px] px-5 py-3 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5"
+              style={btn}
             >
-              {past ? "Watch session" : "Access session"}
+              Access session
             </a>
           )}
-          {past && !href && (
-            <p className="text-sm font-bold uppercase tracking-wide" style={{ color: "#555" }}>Replay coming soon</p>
-          )}
-          {!past && !s.tba && (
-            <details className="group text-sm">
+          {!s.tba && (
+            <details className="text-sm">
               <summary className="cursor-pointer list-none font-bold uppercase tracking-wide underline decoration-2 underline-offset-4">
-                Add to calendar
+                + Calendar
               </summary>
-              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 font-semibold">
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 font-semibold">
                 <a href={googleCalUrl(s)} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Google</a>
                 <a href={icsPath(s)} className="underline underline-offset-4">Apple</a>
                 <a href={outlookCalUrl(s)} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Outlook</a>
@@ -78,15 +98,59 @@ export default function SessionRow({ s, past = false }: { s: Session; past?: boo
             </details>
           )}
         </div>
+      )}
+    </article>
+  );
+}
+
+export function PastRow({ s }: { s: Session }) {
+  const href = s.replayUrl || s.accessUrl;
+  const meta = [s.guest, s.duration ? `${s.duration} min` : ""].filter(Boolean).join(" · ");
+  return (
+    <article style={{ borderTop: "1px solid rgba(255,255,255,0.4)" }} className="grid grid-cols-[4.25rem_1fr] gap-x-4 py-6 sm:grid-cols-[6rem_11rem_1fr] sm:gap-x-8 sm:py-8">
+      <div className="text-[11px] font-bold uppercase leading-snug tracking-[0.15em]">
+        {monthLabel(s)} {dayLabel(s)}
+        <br />
+        <span style={{ color: "#888" }}>{yearLabel(s)}</span>
       </div>
 
-      {/* Optional image: hidden on phones so rows stay short */}
-      {s.image && (
-        <div className="hidden md:block">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={s.image} alt="" className="aspect-video w-full border-[1.5px] border-black object-cover" />
+      <div className="hidden sm:block">
+        {s.image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={s.image} alt="" className="aspect-video w-full object-cover" />
+        )}
+      </div>
+
+      <div className="min-w-0">
+        <h3 className="speaking-display text-2xl sm:text-4xl break-words" style={{ lineHeight: 0.92 }}>
+          {s.title}
+        </h3>
+        <p className="mt-2 max-w-xl text-sm sm:text-[15px] leading-relaxed" style={{ color: "#cfcfcf" }}>
+          {s.description}
+        </p>
+        {meta && (
+          <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.15em]" style={{ color: "#888" }}>
+            {meta}
+          </p>
+        )}
+        <div className="mt-4">
+          {href ? (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-3 py-1.5 text-xs font-bold uppercase tracking-[0.15em]"
+              style={{ background: Y, color: "#000" }}
+            >
+              Watch session →
+            </a>
+          ) : (
+            <span className="text-xs font-bold uppercase tracking-[0.15em]" style={{ color: "#888" }}>
+              Replay coming soon
+            </span>
+          )}
         </div>
-      )}
+      </div>
     </article>
   );
 }

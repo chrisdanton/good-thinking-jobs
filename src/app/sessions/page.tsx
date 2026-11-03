@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import SessionRow from "@/components/sessions/SessionRow";
+import { PastRow, UpcomingTile } from "@/components/sessions/SessionRow";
+import { TimeZonePicker, TimeZoneProvider } from "@/components/sessions/TimeZone";
 import { pastSessions, upcomingSessions } from "@/lib/sessions";
 import { SpeakingFooter } from "../speaking/ui";
 
@@ -17,67 +18,86 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 const SUBSTACK = "https://ingoodco.substack.com";
+const Y = "#F9FF00";
 
 export default function SessionsPage() {
   const upcoming = upcomingSessions();
   const past = pastSessions();
 
   return (
-    <div className="speaking-root min-h-screen overflow-x-hidden font-sans" style={{ background: "#FAFAF8", color: "#000" }}>
-      <main className="mx-auto max-w-6xl px-6 sm:px-10">
-        {/* Masthead */}
-        <header className="pb-14 pt-16 sm:pb-20 sm:pt-24">
-          <h1 className="speaking-display text-[19vw] sm:text-[8rem] lg:text-[10rem]">
-            Good<br />Sessions
-          </h1>
-          <p className="mt-8 max-w-xl text-lg sm:text-xl leading-relaxed">
-            Conversations, briefings and occasional deep dives for GOOD THINKING paid members.
-          </p>
+    <TimeZoneProvider>
+      <div className="speaking-root min-h-screen overflow-x-hidden font-sans" style={{ background: "#FAFAF8", color: "#000" }}>
+        {/* Poster masthead */}
+        <header style={{ background: Y, color: "#000" }} className="border-b-2 border-black">
+          <div className="mx-auto max-w-6xl px-5 pb-10 pt-8 sm:px-10 sm:pb-14 sm:pt-10">
+            <div className="flex justify-between border-b-2 border-black pb-3 text-[11px] font-bold uppercase tracking-[0.25em]">
+              <span>GOOD THINKING</span>
+              <span>Paid member programming</span>
+            </div>
+            <h1 className="speaking-display mt-6 text-[25vw] sm:text-[11rem] lg:text-[13rem]" style={{ lineHeight: 0.82 }}>
+              Good
+              <br />
+              Sessions
+            </h1>
+            <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <p className="max-w-md text-lg leading-snug sm:text-xl">
+                Conversations, briefings and occasional deep dives for GOOD THINKING paid members.
+              </p>
+              <TimeZonePicker />
+            </div>
+          </div>
         </header>
 
-        {/* Upcoming */}
-        <section aria-labelledby="upcoming">
-          <h2 id="upcoming" className="pb-4 text-[11px] sm:text-xs font-bold uppercase tracking-[0.3em]">
-            Upcoming
-          </h2>
+        {/* Upcoming: the poster blocks */}
+        <section aria-labelledby="upcoming" className="mx-auto max-w-6xl px-5 py-14 sm:px-10 sm:py-20">
+          <h2 id="upcoming" className="speaking-display text-4xl sm:text-6xl">Coming up</h2>
           {upcoming.length ? (
-            upcoming.map((s) => <SessionRow key={s.slug} s={s} />)
-          ) : (
-            <div className="border-t-2 border-black py-12">
-              <p className="speaking-display text-3xl sm:text-5xl">Next session coming soon.</p>
-              <p className="mt-4 text-lg">
-                Paid members hear first.{" "}
-                <a href={SUBSTACK} className="font-bold underline decoration-2 underline-offset-4">
-                  Join on Substack
-                </a>
-              </p>
+            <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+              {upcoming.map((s, i) => (
+                <UpcomingTile key={s.slug} s={s} index={i} />
+              ))}
             </div>
+          ) : (
+            <p className="mt-6 text-lg">
+              Next session coming soon. Paid members hear first.{" "}
+              <a href={SUBSTACK} className="font-bold underline decoration-2 underline-offset-4">Join on Substack</a>
+            </p>
           )}
         </section>
 
-        {/* Past */}
+        {/* Past: the dark weekly-listing look */}
         {past.length > 0 && (
-          <section aria-labelledby="past" className="mt-20 sm:mt-28">
-            <h2 id="past" className="pb-4 text-[11px] sm:text-xs font-bold uppercase tracking-[0.3em]">
-              Past sessions
-            </h2>
-            {past.map((s) => (
-              <SessionRow key={s.slug} s={s} past />
-            ))}
+          <section aria-labelledby="past" style={{ background: "#000", color: "#fff" }}>
+            <div className="mx-auto max-w-6xl px-5 py-14 sm:px-10 sm:py-20">
+              <div className="flex items-end justify-between pb-6">
+                <h2 id="past" className="speaking-display text-4xl sm:text-6xl">Past sessions</h2>
+                <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: Y }}>
+                  Replays for members
+                </span>
+              </div>
+              {past.map((s) => (
+                <PastRow key={s.slug} s={s} />
+              ))}
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.4)" }} />
+            </div>
           </section>
         )}
 
-        {/* Closing note: where access lives */}
-        <div className="mb-24 mt-10 border-t-2 border-black pt-10 sm:mb-32">
-          <p className="max-w-xl text-base leading-relaxed">
-            GOOD SESSIONS are included with a paid GOOD THINKING membership.{" "}
-            <a href={SUBSTACK} className="font-bold underline decoration-2 underline-offset-4">
+        {/* Membership note */}
+        <div style={{ background: Y, color: "#000" }} className="border-y-2 border-black">
+          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+            <p className="speaking-display text-2xl sm:text-3xl">Included with a paid GOOD THINKING membership</p>
+            <a
+              href={SUBSTACK}
+              className="inline-block self-start border-[1.5px] px-6 py-3 text-sm font-bold uppercase tracking-wide sm:self-auto"
+              style={{ background: "#000", color: "#fff", borderColor: "#000" }}
+            >
               Become a member
             </a>
-          </p>
+          </div>
         </div>
-      </main>
-      <SpeakingFooter />
-    </div>
+        <SpeakingFooter />
+      </div>
+    </TimeZoneProvider>
   );
 }
