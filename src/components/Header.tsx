@@ -9,7 +9,7 @@ export default function Header() {
   // Sections with their own chrome, or where GlobalBar + page content already
   // cover navigation (the job board's Post a Job / Subscribe live in its hero).
   if (pathname?.startsWith("/futures")) return null;
-  if (pathname?.startsWith("/speaking") || pathname?.startsWith("/sessions") || pathname?.startsWith("/good-index") || pathname === "/index" || pathname?.startsWith("/index/")) return null;
+  if (pathname?.startsWith("/speaking") || pathname?.startsWith("/sessions") || pathname?.startsWith("/good-index")) return null;
   if (pathname?.startsWith("/jobs")) return null;
 
   return (

@@ -21,10 +21,6 @@ const nextConfig = {
       { source: "/futures/", destination: "/futures/index.html" },
       { source: "/futures/trends/:slug", destination: "/futures/trends/:slug.html" },
       { source: "/futures/trends/:slug/", destination: "/futures/trends/:slug.html" },
-      // GOOD INDEX: public URL is /index; the pages live in app/good-index because
-      // Next.js reserves an app folder named "index".
-      { source: "/index", destination: "/good-index" },
-      { source: "/index/:path*", destination: "/good-index/:path*" },
     ];
   },
 };

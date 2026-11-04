@@ -17,7 +17,7 @@ export function IndexShell({ children }: { children: ReactNode }) {
 // Small wordmark that links back to the GOOD INDEX home.
 export function IndexMark() {
   return (
-    <a href="/index" className="text-[11px] font-bold uppercase tracking-[0.3em]">
+    <a href="/good-index" className="text-[11px] font-bold uppercase tracking-[0.3em]">
       GOOD INDEX
     </a>
   );
@@ -25,7 +25,7 @@ export function IndexMark() {
 
 export function SearchField({ q = "", big = false }: { q?: string; big?: boolean }) {
   return (
-    <form action="/index" method="get" role="search">
+    <form action="/good-index" method="get" role="search">
       <label htmlFor="gi-q" className="sr-only">
         Search the GOOD THINKING archive
       </label>

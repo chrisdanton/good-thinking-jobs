@@ -21,7 +21,7 @@ export default async function PredictionPage({ params }: { params: { year: strin
   const { before, after } = await relatedTo(pred);
   return (
     <IndexShell>
-      <a href={`/index/future/${params.year}`} className="text-[11px] font-bold uppercase tracking-[0.3em]">
+      <a href={`/good-index/future/${params.year}`} className="text-[11px] font-bold uppercase tracking-[0.3em]">
         GOOD INDEX · GOOD FUTURE {params.year}
       </a>
       <div className="mt-4">

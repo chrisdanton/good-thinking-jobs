@@ -21,7 +21,7 @@ export default async function SignPage({ params }: { params: { slug: string } })
   const { before, after } = await relatedTo(sign);
   return (
     <IndexShell>
-      <a href="/index/signs" className="text-[11px] font-bold uppercase tracking-[0.3em]">GOOD INDEX · GOOD SIGNS</a>
+      <a href="/good-index/signs" className="text-[11px] font-bold uppercase tracking-[0.3em]">GOOD INDEX · GOOD SIGNS</a>
       <div className="mt-4">
         <Timeline anchor={sign} kind="GOOD SIGN" before={before} after={after} />
       </div>

@@ -14,7 +14,7 @@ export default async function GoodIndexHome({ searchParams }: { searchParams: { 
   if (q) {
     return (
       <IndexShell>
-        <a href="/index" className="text-[11px] font-bold uppercase tracking-[0.3em]">GOOD INDEX</a>
+        <a href="/good-index" className="text-[11px] font-bold uppercase tracking-[0.3em]">GOOD INDEX</a>
         <div className="mt-8">
           <SearchField q={q} />
         </div>
@@ -45,13 +45,13 @@ export default async function GoodIndexHome({ searchParams }: { searchParams: { 
       </div>
 
       <div className="mt-24 space-y-12 sm:mt-32">
-        <BigLink href="/index/signs">GOOD SIGNS →</BigLink>
+        <BigLink href="/good-index/signs">GOOD SIGNS →</BigLink>
         <div>
           <p className="speaking-display text-5xl sm:text-7xl">GOOD FUTURE</p>
           <div className="mt-2">
             {FUTURE_YEARS.map((y) =>
               y.live ? (
-                <BigLink key={y.year} href={`/index/future/${y.year}`}>{y.year} →</BigLink>
+                <BigLink key={y.year} href={`/good-index/future/${y.year}`}>{y.year} →</BigLink>
               ) : (
                 <BigLink key={y.year}>{y.year} · Coming soon</BigLink>
               )
