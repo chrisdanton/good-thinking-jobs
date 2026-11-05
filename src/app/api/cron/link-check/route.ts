@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
-import { sendLinkCheckReport, sendDeadLinkNotice } from "@/lib/email";
+import { sendLinkCheckReport } from "@/lib/email";
 import { CURATED_POSTER_NAME } from "@/lib/constants";
 import { looksExpired } from "@/lib/title-match";
 import { readableUrlFor } from "@/lib/extract-job";
-import { Job } from "@/lib/types";
 
 interface CheckedJob {
   id: string;
@@ -173,6 +172,7 @@ export async function GET(req: NextRequest) {
   const jobs = (data || []).filter((j) => (j.external_apply_url as string)?.startsWith("http"));
 
   const removed: CheckedJob[] = [];
+  const review: CheckedJob[] = [];
   let aliveCount = 0;
 
   for (const j of jobs) {
@@ -184,50 +184,36 @@ export async function GET(req: NextRequest) {
       continue;
     }
 
-    // Definitely gone — remove it. Live jobs are never touched, so a listing only
-    // gets pulled when its own link is genuinely dead.
-    if (!dryRun) await sb.from("jobs").update({ status: "removed" }).eq("id", j.id);
-
-    // An employer who posted this themselves gets a friendly heads-up with a free
-    // repost offer; GOOD THINKING's own curated listings are pulled quietly.
+    // GOOD THINKING's own curated listings are pulled quietly. A listing an
+    // employer posted (and maybe paid for) is never removed automatically: a
+    // bad read once pulled M+C Saatchi's live Account Director role and emailed
+    // them that their link was dead. Those go to Chris's report to check by hand.
     const isCurated = j.poster_name === CURATED_POSTER_NAME;
-    const posterEmail = String(j.poster_email || "");
-    let note = `${reason}. Removed automatically.`;
-    if (!isCurated && /@/.test(posterEmail)) {
-      if (!dryRun) {
-        try {
-          await sendDeadLinkNotice({
-            title: j.title,
-            companyName: j.company_name,
-            posterEmail,
-          } as Job);
-          note += ` Poster (${posterEmail}) notified with a free-repost offer.`;
-        } catch (err) {
-          console.error("Failed to send dead-link notice:", err);
-          note += ` Couldn't reach the poster (${posterEmail}).`;
-        }
-      } else {
-        note += ` Would notify poster (${posterEmail}).`;
-      }
-    }
-
-    removed.push({
+    const item = {
       id: j.id as string,
       title: j.title as string,
       company: j.company_name as string,
       url,
-      reason: note,
-    });
+      reason: "",
+    };
+    if (!isCurated) {
+      const who = String(j.poster_email || "the employer");
+      review.push({ ...item, reason: `${reason}. Posted by ${who}, so left up. Check the link and remove it in /admin if it's really gone.` });
+      continue;
+    }
+
+    if (!dryRun) await sb.from("jobs").update({ status: "removed" }).eq("id", j.id);
+    removed.push({ ...item, reason: `${reason}. Removed automatically.` });
   }
 
   // Only email when there's actually something to report — no news, no email.
-  if (!dryRun && removed.length > 0) {
+  if (!dryRun && (removed.length > 0 || review.length > 0)) {
     try {
-      await sendLinkCheckReport({ checked: jobs.length, aliveCount, removed, review: [] });
+      await sendLinkCheckReport({ checked: jobs.length, aliveCount, removed, review });
     } catch (err) {
       console.error("Failed to send link-check report:", err);
     }
   }
 
-  return NextResponse.json({ ok: true, dryRun, checked: jobs.length, aliveCount, removed });
+  return NextResponse.json({ ok: true, dryRun, checked: jobs.length, aliveCount, removed, review });
 }
