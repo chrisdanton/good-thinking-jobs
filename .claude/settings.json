@@ -41,6 +41,13 @@
       "Bash(awk:*)",
       "Bash(/Applications/Google Chrome.app/Contents/MacOS/Google Chrome:*)",
       "Bash(/opt/homebrew/bin/vercel:*)",
+      "WebFetch",
+      "WebSearch",
+      "mcp__claude_ai_Google_Drive__search_files",
+      "mcp__claude_ai_Google_Drive__read_file_content",
+      "mcp__claude_ai_Google_Drive__get_file_metadata",
+      "mcp__claude_ai_Google_Drive__download_file_content",
+      "mcp__claude_ai_Google_Drive__list_recent_files",
       "Read",
       "Edit",
       "Write"

@@ -104,7 +104,8 @@ export function UpcomingTile({ s, index }: { s: Session; index: number }) {
 }
 
 export function PastRow({ s }: { s: Session }) {
-  const href = s.replayUrl || s.accessUrl;
+  // No replay link yet: send people to the Substack perks page (members watch, others upgrade).
+  const href = s.replayUrl || "https://ingoodco.substack.com/perks";
   const meta = [s.guest, s.duration ? `${s.duration} min` : ""].filter(Boolean).join(" · ");
   return (
     <article style={{ borderTop: "1px solid rgba(255,255,255,0.4)" }} className="grid grid-cols-[4.25rem_1fr] gap-x-4 py-6 sm:grid-cols-[6rem_11rem_1fr] sm:gap-x-8 sm:py-8">
