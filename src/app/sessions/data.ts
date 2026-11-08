@@ -39,7 +39,7 @@ export const SESSIONS: Session[] = [
     timezone: "America/New_York",
     description: "How brands can show up on Substack, and who's already doing it well. Not a “how-to” but a “what good looks like.”",
     guest: "Chris + Kirsten",
-    accessUrl: "", // paste the paid-only Substack link here
+    accessUrl: "https://open.substack.com/live-stream/448994",
     status: "upcoming",
   },
   {
